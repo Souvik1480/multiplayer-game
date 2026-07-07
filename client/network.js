@@ -3,6 +3,7 @@ const socket = new WebSocket(
 );
 
 export let players = {};
+export let bullets = [];
 
 socket.onopen = () => {
 
@@ -16,7 +17,7 @@ socket.onmessage = (event) => {
         JSON.parse(event.data);
 
     players = data.players;
-
+    bullets = data.bullets || [];
 };
 
 socket.onerror = (err) => {
