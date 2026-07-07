@@ -26,6 +26,8 @@ wss.on("connection", (ws) => {
         x: 100,
         y: 100,
 
+        angle:0,
+
         mouseX: 0,
         mouseY: 0,
 
@@ -113,6 +115,10 @@ setInterval(() => {
                     dx * dx +
                     dy * dy
                 );
+
+            if(len>0){
+                p.angle=Math.atan2(dy, dx);
+            }
 
             if (len > 0) {
 

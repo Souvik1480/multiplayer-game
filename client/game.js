@@ -116,19 +116,48 @@ function render() {
             6
         );
 
-        // DEAD OR ALIVE COLOR
+        ctx.save();
+
+        ctx.translate(
+
+            p.x + 25,
+            p.y + 25
+
+        );
+
+        ctx.rotate(
+            p.angle
+        );
+
         ctx.fillStyle =
             p.alive
                 ? "gold"
                 : "gray";
 
-        // PLAYER BODY
         ctx.fillRect(
-            p.x,
-            p.y,
+
+            -25,
+            -25,
+
             50,
             50
+
         );
+
+        // Gun barrel
+        ctx.fillStyle = "black";
+
+        ctx.fillRect(
+
+            0,
+            -3,
+
+            30,
+            6
+
+        );
+
+        ctx.restore();
 
         // PLAYER NAME
         ctx.fillStyle = "white";
