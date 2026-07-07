@@ -1,5 +1,6 @@
 import { keys } from "./input.js";
 import socket, { players, bullets } from "./network.js";
+export const particles=[];
 
 let mouseX = 0;
 let mouseY = 0;
@@ -277,6 +278,30 @@ function render() {
 
         ctx.fill();
     }
+
+    for(const p of particles){
+
+    ctx.beginPath();
+
+    ctx.arc(
+
+        p.x,
+
+        p.y,
+
+        p.life/3,
+
+        0,
+
+        Math.PI*2
+
+    );
+
+    ctx.fillStyle="orange";
+
+    ctx.fill();
+
+}
 }
 
 function interpolate() {

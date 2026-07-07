@@ -2,6 +2,7 @@ const WebSocket = require("ws");
 
 const players = {};
 const bullets = [];
+const particles = [];
 
 const wss = new WebSocket.Server({
     port: 8080
@@ -26,7 +27,7 @@ wss.on("connection", (ws) => {
         x: 100,
         y: 100,
 
-        angle:0,
+        angle: 0,
 
         mouseX: 0,
         mouseY: 0,
@@ -63,8 +64,8 @@ wss.on("connection", (ws) => {
         p.mouseX = input.mouseX;
         p.mouseY = input.mouseY;
 
-        if(input.shoot>0){
-            p.shoot=true;
+        if (input.shoot > 0) {
+            p.shoot = true;
         }
     });
 
@@ -116,8 +117,8 @@ setInterval(() => {
                     dy * dy
                 );
 
-            if(len>0){
-                p.angle=Math.atan2(dy, dx);
+            if (len > 0) {
+                p.angle = Math.atan2(dy, dx);
             }
 
             if (len > 0) {
@@ -297,7 +298,42 @@ setInterval(() => {
         if (hit) {
 
             bullets.splice(i, 1);
+
+            particles.push({
+
+                x: b.x,
+
+                y: b.y,
+
+                life: 20
+
+            });
         }
+    }
+
+    for (
+
+        let i =
+            particles.length - 1;
+
+        i >= 0;
+
+        i--
+
+    ) {
+
+        particles[i].life--;
+
+        if (
+
+            particles[i].life <= 0
+
+        ) {
+
+            particles.splice(i, 1);
+
+        }
+
     }
 
 }, 1000 / 60);
@@ -309,7 +345,8 @@ setInterval(() => {
         JSON.stringify({
 
             players,
-            bullets
+            bullets,
+            particles
 
         });
 
