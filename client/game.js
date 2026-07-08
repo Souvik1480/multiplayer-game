@@ -1,5 +1,6 @@
 import { keys } from "./input.js";
 import socket, { players, bullets } from "./network.js";
+import { map, TILE_SIZE } from "./map.js";
 
 let mouseX = 0;
 let mouseY = 0;
@@ -62,10 +63,65 @@ function createHitEffect(x, y) {
 
 }
 
+function drawMap() {
+
+    for (
+
+        let row = 0;
+
+        row < map.length;
+
+        row++
+
+    ) {
+
+        for (
+
+            let col = 0;
+
+            col < map[row].length;
+
+            col++
+
+        ) {
+
+            const tile =
+                map[row][col];
+
+            if (tile === "#") {
+
+                ctx.fillStyle =
+                    "#444";
+
+            } else {
+
+                ctx.fillStyle =
+                    "#1d1d1d";
+
+            }
+
+            ctx.fillRect(
+
+                col * TILE_SIZE,
+
+                row * TILE_SIZE,
+
+                TILE_SIZE,
+
+                TILE_SIZE
+
+            );
+
+        }
+
+    }
+
+}
+
 
 function render() {
 
-    console.log("RENDER");
+
 
     ctx.clearRect(
         0,
@@ -73,6 +129,8 @@ function render() {
         canvas.width,
         canvas.height
     );
+
+    drawMap();
 
     // Bullet counter
     ctx.fillStyle = "white";
@@ -303,9 +361,8 @@ function render() {
     ctx.fillStyle = "red";
 
     ctx.fill();
-    console.log("Particles:", particles.length);
 
-    for (const p of particles) {
+    for (const p of hitParticles) {
 
         ctx.beginPath();
 
@@ -315,7 +372,7 @@ function render() {
 
             p.y,
 
-            p.life / 3,
+            3,
 
             0,
 

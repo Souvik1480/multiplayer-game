@@ -1,3 +1,21 @@
+const MAP = [
+
+    "####################",
+    "#..................#",
+    "#......####........#",
+    "#..................#",
+    "#..........#####...#",
+    "#..................#",
+    "#....###...........#",
+    "#..................#",
+    "#..............##..#",
+    "#..................#",
+    "####################"
+
+];
+
+const TILE_SIZE = 64;
+
 const WebSocket = require("ws");
 
 const players = {};
@@ -80,6 +98,23 @@ wss.on("connection", (ws) => {
     });
 });
 
+function isWall(x, y) {
+
+    const col = Math.floor(x / TILE_SIZE);
+    const row = Math.floor(y / TILE_SIZE);
+
+    if (
+        row < 0 ||
+        row >= MAP.length ||
+        col < 0 ||
+        col >= MAP[0].length
+    ) {
+        return true;
+    }
+
+    return MAP[row][col] === "#";
+}
+
 setInterval(() => {
 
     // PLAYER UPDATE
@@ -90,17 +125,39 @@ setInterval(() => {
         if (!p.alive)
             continue;
 
+        let newX = p.x;
+        let newY = p.y;
+
         if (p.up)
-            p.y -= 5;
+            newY -= 5;
 
         if (p.down)
-            p.y += 5;
+            newY += 5;
 
         if (p.left)
-            p.x -= 5;
+            newX -= 5;
 
         if (p.right)
-            p.x += 5;
+            newX += 5;
+
+        const size = 50;
+
+        const hitWall =
+
+            isWall(newX, newY) ||
+
+            isWall(newX + size, newY) ||
+
+            isWall(newX, newY + size) ||
+
+            isWall(newX + size, newY + size);
+
+        if (!hitWall) {
+
+            p.x = newX;
+            p.y = newY;
+
+        }
 
         // SHOOT
         if (p.shoot) {
@@ -301,7 +358,7 @@ setInterval(() => {
             bullets.splice(i, 1);
 
             console.log("ADDING PARTICLE");
-            
+
             particles.push({
 
                 x: b.x,
