@@ -218,6 +218,7 @@ setInterval(() => {
                 );
 
                 hit = true;
+                console.log("HIT DETECTED");
 
                 // DEATH
                 if (
@@ -299,6 +300,8 @@ setInterval(() => {
 
             bullets.splice(i, 1);
 
+            console.log("ADDING PARTICLE");
+            
             particles.push({
 
                 x: b.x,
@@ -308,6 +311,7 @@ setInterval(() => {
                 life: 20
 
             });
+            console.log("Particle created:", particles.length);
         }
     }
 
@@ -341,6 +345,7 @@ setInterval(() => {
 // SEND GAME STATE
 setInterval(() => {
 
+    // console.log("sending particles:", particles.length);
     const state =
         JSON.stringify({
 

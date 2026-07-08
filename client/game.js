@@ -1,10 +1,10 @@
 import { keys } from "./input.js";
 import socket, { players, bullets } from "./network.js";
-export const particles=[];
 
 let mouseX = 0;
 let mouseY = 0;
 let shootRequest = 0;
+const hitParticles = [];
 
 window.addEventListener(
     "mousemove",
@@ -21,6 +21,7 @@ window.addEventListener(
     () => {
 
         shootRequest++;
+        createHitEffect(mouseX, mouseY);
 
     }
 );
@@ -41,8 +42,30 @@ function update() {
 
 }
 
+function createHitEffect(x, y) {
+
+    for (let i = 0; i < 15; i++) {
+
+        hitParticles.push({
+
+            x,
+            y,
+
+            vx: (Math.random() - 0.5) * 8,
+            vy: (Math.random() - 0.5) * 8,
+
+            life: 30
+
+        });
+
+    }
+
+}
+
 
 function render() {
+
+    console.log("RENDER");
 
     ctx.clearRect(
         0,
@@ -223,50 +246,76 @@ function render() {
 
         ctx.fill();
 
-        // CROSSHAIR
 
-        ctx.strokeStyle = "white";
-        ctx.lineWidth = 2;
+    }
 
-        // Horizontal
-        ctx.beginPath();
+    // CROSSHAIR
 
-        ctx.moveTo(
-            mouseX - 10,
-            mouseY
-        );
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 2;
 
-        ctx.lineTo(
-            mouseX + 10,
-            mouseY
-        );
+    // Horizontal
+    ctx.beginPath();
 
-        ctx.stroke();
+    ctx.moveTo(
+        mouseX - 10,
+        mouseY
+    );
 
-        // Vertical
-        ctx.beginPath();
+    ctx.lineTo(
+        mouseX + 10,
+        mouseY
+    );
 
-        ctx.moveTo(
-            mouseX,
-            mouseY - 10
-        );
+    ctx.stroke();
 
-        ctx.lineTo(
-            mouseX,
-            mouseY + 10
-        );
+    // Vertical
+    ctx.beginPath();
 
-        ctx.stroke();
+    ctx.moveTo(
+        mouseX,
+        mouseY - 10
+    );
 
-        // Center dot
+    ctx.lineTo(
+        mouseX,
+        mouseY + 10
+    );
+
+    ctx.stroke();
+
+    // Center dot
+    ctx.beginPath();
+
+    ctx.arc(
+
+        mouseX,
+        mouseY,
+
+        3,
+
+        0,
+
+        Math.PI * 2
+
+    );
+
+    ctx.fillStyle = "red";
+
+    ctx.fill();
+    console.log("Particles:", particles.length);
+
+    for (const p of particles) {
+
         ctx.beginPath();
 
         ctx.arc(
 
-            mouseX,
-            mouseY,
+            p.x,
 
-            3,
+            p.y,
+
+            p.life / 3,
 
             0,
 
@@ -274,34 +323,29 @@ function render() {
 
         );
 
-        ctx.fillStyle = "red";
+        ctx.fillStyle = "orange";
 
         ctx.fill();
+
     }
 
-    for(const p of particles){
+    for (const p of hitParticles) {
 
-    ctx.beginPath();
+        ctx.beginPath();
 
-    ctx.arc(
+        ctx.arc(
+            p.x,
+            p.y,
+            3,
+            0,
+            Math.PI * 2
+        );
 
-        p.x,
+        ctx.fillStyle = "orange";
 
-        p.y,
+        ctx.fill();
 
-        p.life/3,
-
-        0,
-
-        Math.PI*2
-
-    );
-
-    ctx.fillStyle="orange";
-
-    ctx.fill();
-
-}
+    }
 }
 
 function interpolate() {
@@ -335,6 +379,8 @@ function interpolate() {
 
 function gameLoop() {
 
+    console.log("GAME LOOP");
+
     update();
 
     interpolate();
@@ -367,6 +413,24 @@ function gameLoop() {
             })
 
         );
+    }
+
+    // Update hit particles
+    for (let i = hitParticles.length - 1; i >= 0; i--) {
+
+        const p = hitParticles[i];
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        p.life--;
+
+        if (p.life <= 0) {
+
+            hitParticles.splice(i, 1);
+
+        }
+
     }
 
     render();
