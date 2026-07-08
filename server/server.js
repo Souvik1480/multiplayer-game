@@ -1,20 +1,9 @@
-const MAP = [
+const {
 
-    "####################",
-    "#..................#",
-    "#......####........#",
-    "#..................#",
-    "#..........#####...#",
-    "#..................#",
-    "#....###...........#",
-    "#..................#",
-    "#..............##..#",
-    "#..................#",
-    "####################"
+    MAP,
+    TILE_SIZE
 
-];
-
-const TILE_SIZE = 64;
+} = require("./map");
 
 const WebSocket = require("ws");
 
@@ -113,6 +102,12 @@ function isWall(x, y) {
     }
 
     return MAP[row][col] === "#";
+}
+
+function bulletHitWall(x, y) {
+
+    return isWall(x, y);
+
 }
 
 setInterval(() => {
@@ -222,6 +217,50 @@ setInterval(() => {
 
         b.x += b.vx;
         b.y += b.vy;
+
+        if (isWall(b.x, b.y)) {
+
+            for (let j = 0; j < 8; j++) {
+
+                particles.push({
+
+                    x: b.x,
+                    y: b.y,
+
+                    vx: (Math.random() - 0.5) * 5,
+                    vy: (Math.random() - 0.5) * 5,
+
+                    life: 20,
+
+                    color: "orange"
+
+                });
+
+            }
+
+            bullets.splice(i, 1);
+
+            continue;
+
+        }
+
+        if (
+
+            bulletHitWall(
+
+                b.x,
+
+                b.y
+
+            )
+
+        ) {
+
+            bullets.splice(i, 1);
+
+            continue;
+
+        }
 
         // remove offscreen bullets
         if (
