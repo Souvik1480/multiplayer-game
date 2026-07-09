@@ -4,6 +4,7 @@ const socket = new WebSocket(
 
 export let players = {};
 export let bullets = [];
+export let myId = "";
 export let particles = [];
 
 socket.onopen = () => {
@@ -17,8 +18,13 @@ socket.onmessage = (event) => {
     const data =
         JSON.parse(event.data);
 
+    if (data.type === "init") {
+        myId = data.id;
+        console.log("MY ID:", myId)
+        return;
+    }
+
     players = data.players;
-    console.log(Object.keys(players).length);
     bullets = data.bullets || [];
     particles=data.particles || [];
 };
