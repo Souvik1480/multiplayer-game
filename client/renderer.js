@@ -1,4 +1,4 @@
-import { players, bullets } from "./network.js";
+import { players, bullets, myId } from "./network.js";
 import { map, TILE_SIZE } from "./map.js";
 import { cameraX, cameraY } from "./camera.js";
 
@@ -72,11 +72,21 @@ function drawPlayers(ctx) {
 
         ctx.rotate(p.angle);
 
-        ctx.fillStyle =
-            p.alive
-                ? "gold"
-                : "gray";
+        if (!p.alive) {
 
+            ctx.fillStyle = "gray";
+
+        }
+        else if (id === myId) {
+
+            ctx.fillStyle = "dodgerblue";
+
+        }
+        else {
+
+            ctx.fillStyle = "gold";
+
+        }
         ctx.fillRect(
 
             -25,
