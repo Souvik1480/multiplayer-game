@@ -2,11 +2,12 @@ import { keys } from "./input.js";
 import socket, { players, bullets } from "./network.js";
 import { map, TILE_SIZE } from "./map.js";
 import { render } from "./renderer.js";
+import { hitParticles, createHitEffect, updateParticles } from "./particles.js";
+import {updateCamera, cameraX, cameraY} from"./camera.js";
 
 let mouseX = 0;
 let mouseY = 0;
 let shootRequest = 0;
-const hitParticles = [];
 
 window.addEventListener(
     "mousemove",
@@ -44,26 +45,6 @@ function update() {
 
 }
 
-function createHitEffect(x, y) {
-
-    for (let i = 0; i < 15; i++) {
-
-        hitParticles.push({
-
-            x,
-            y,
-
-            vx: (Math.random() - 0.5) * 8,
-            vy: (Math.random() - 0.5) * 8,
-
-            life: 30
-
-        });
-
-    }
-
-}
-
 
 function interpolate() {
 
@@ -94,61 +75,50 @@ function interpolate() {
     }
 }
 
-function gameLoop() {
+function sendInput() {
 
-    console.log("GAME LOOP");
+    if (socket.readyState !== WebSocket.OPEN)
+        return;
+
+    const fire = shootRequest > 0;
+
+    if (fire) {
+
+        shootRequest--;
+
+    }
+
+    socket.send(
+
+        JSON.stringify({
+
+            up: keys.w,
+            down: keys.s,
+            left: keys.a,
+            right: keys.d,
+
+            mouseX:mouseX+cameraX,
+            mouseY:mouseY+cameraY,
+
+            shoot: fire
+
+        })
+
+    );
+
+}
+
+function gameLoop() {
 
     update();
 
     interpolate();
 
-    if (socket.readyState === WebSocket.OPEN) {
+    updateCamera(players);
 
-        const fire = shootRequest > 0;
+    sendInput();
 
-        if (fire) {
-
-            console.log("SEND SHOT");
-
-            shootRequest--;
-        }
-
-        socket.send(
-
-            JSON.stringify({
-
-                up: keys.w,
-                down: keys.s,
-                left: keys.a,
-                right: keys.d,
-
-                mouseX,
-                mouseY,
-
-                shoot: fire
-
-            })
-
-        );
-    }
-
-    // Update hit particles
-    for (let i = hitParticles.length - 1; i >= 0; i--) {
-
-        const p = hitParticles[i];
-
-        p.x += p.vx;
-        p.y += p.vy;
-
-        p.life--;
-
-        if (p.life <= 0) {
-
-            hitParticles.splice(i, 1);
-
-        }
-
-    }
+    updateParticles();
 
     render(
 

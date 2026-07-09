@@ -1,5 +1,6 @@
 import { players, bullets } from "./network.js";
 import { map, TILE_SIZE } from "./map.js";
+import { cameraX, cameraY } from "./camera.js";
 
 function drawMap(ctx) {
 
@@ -7,21 +8,17 @@ function drawMap(ctx) {
 
         for (let col = 0; col < map[row].length; col++) {
 
-            const tile = map[row][col];
-
             ctx.fillStyle =
-                tile === "#"
+                map[row][col] === "#"
                     ? "#444"
                     : "#1d1d1d";
 
             ctx.fillRect(
 
                 col * TILE_SIZE,
-
                 row * TILE_SIZE,
 
                 TILE_SIZE,
-
                 TILE_SIZE
 
             );
@@ -32,121 +29,34 @@ function drawMap(ctx) {
 
 }
 
-export function render(
-
-    ctx,
-    canvas,
-
-    mouseX,
-    mouseY,
-
-    hitParticles
-
-) {
-
-    ctx.clearRect(
-
-        0,
-        0,
-
-        canvas.width,
-        canvas.height
-
-    );
-
-    drawMap(ctx);
-
-    // --------------------
-    // BULLET COUNTER
-    // --------------------
-
-    ctx.fillStyle = "white";
-    ctx.font = "20px Arial";
-
-    ctx.fillText(
-
-        "Bullets: " + bullets.length,
-
-        20,
-
-        20
-
-    );
-
-    // --------------------
-    // SCOREBOARD
-    // --------------------
-
-    let scoreY = 60;
-
-    ctx.font = "22px Arial";
-
-    ctx.fillText(
-
-        "🏆 SCOREBOARD",
-
-        20,
-
-        scoreY
-
-    );
-
-    scoreY += 30;
-
-    for (const id in players) {
-
-        const p = players[id];
-
-        ctx.fillText(
-
-            p.name + " : " + p.kills,
-
-            20,
-
-            scoreY
-
-        );
-
-        scoreY += 25;
-
-    }
-
-    // --------------------
-    // PLAYERS
-    // --------------------
+function drawPlayers(ctx) {
 
     for (const id in players) {
 
         const p = players[id];
 
         // Health background
-
         ctx.fillStyle = "red";
 
         ctx.fillRect(
 
             p.x,
-
             p.y - 20,
 
             50,
-
             6
 
         );
 
         // Health
-
         ctx.fillStyle = "lime";
 
         ctx.fillRect(
 
             p.x,
-
             p.y - 20,
 
             p.hp / 2,
-
             6
 
         );
@@ -156,7 +66,6 @@ export function render(
         ctx.translate(
 
             p.x + 25,
-
             p.y + 25
 
         );
@@ -164,37 +73,29 @@ export function render(
         ctx.rotate(p.angle);
 
         ctx.fillStyle =
-
             p.alive
-
                 ? "gold"
-
                 : "gray";
 
         ctx.fillRect(
 
             -25,
-
             -25,
 
             50,
-
             50
 
         );
 
         // Gun
-
         ctx.fillStyle = "black";
 
         ctx.fillRect(
 
             0,
-
             -3,
 
             30,
-
             6
 
         );
@@ -250,9 +151,9 @@ export function render(
 
     }
 
-    // --------------------
-    // BULLETS
-    // --------------------
+}
+
+function drawBullets(ctx) {
 
     for (const b of bullets) {
 
@@ -261,13 +162,11 @@ export function render(
         ctx.arc(
 
             b.x,
-
             b.y,
 
             8,
 
             0,
-
             Math.PI * 2
 
         );
@@ -278,9 +177,83 @@ export function render(
 
     }
 
-    // --------------------
-    // CROSSHAIR
-    // --------------------
+}
+
+function drawParticles(ctx, hitParticles) {
+
+    for (const p of hitParticles) {
+
+        ctx.beginPath();
+
+        ctx.arc(
+
+            p.x,
+            p.y,
+
+            3,
+
+            0,
+            Math.PI * 2
+
+        );
+
+        ctx.fillStyle = "orange";
+
+        ctx.fill();
+
+    }
+
+}
+
+function drawUI(ctx) {
+
+    ctx.fillStyle = "white";
+    ctx.font = "20px Arial";
+
+    ctx.fillText(
+
+        "Bullets: " + bullets.length,
+
+        20,
+        20
+
+    );
+
+    let y = 60;
+
+    ctx.font = "22px Arial";
+
+    ctx.fillText(
+
+        "🏆 SCOREBOARD",
+
+        20,
+        y
+
+    );
+
+    y += 30;
+
+    for (const id in players) {
+
+        ctx.fillText(
+
+            players[id].name +
+            " : " +
+            players[id].kills,
+
+            20,
+            y
+
+        );
+
+        y += 25;
+
+    }
+
+}
+
+function drawCrosshair(ctx, mouseX, mouseY) {
 
     ctx.strokeStyle = "white";
 
@@ -291,7 +264,6 @@ export function render(
     ctx.moveTo(
 
         mouseX - 10,
-
         mouseY
 
     );
@@ -299,7 +271,6 @@ export function render(
     ctx.lineTo(
 
         mouseX + 10,
-
         mouseY
 
     );
@@ -311,7 +282,6 @@ export function render(
     ctx.moveTo(
 
         mouseX,
-
         mouseY - 10
 
     );
@@ -319,7 +289,6 @@ export function render(
     ctx.lineTo(
 
         mouseX,
-
         mouseY + 10
 
     );
@@ -331,7 +300,6 @@ export function render(
     ctx.arc(
 
         mouseX,
-
         mouseY,
 
         3,
@@ -346,32 +314,68 @@ export function render(
 
     ctx.fill();
 
-    // --------------------
-    // HIT PARTICLES
-    // --------------------
+}
 
-    for (const p of hitParticles) {
+export function render(
 
-        ctx.beginPath();
+    ctx,
+    canvas,
 
-        ctx.arc(
+    mouseX,
+    mouseY,
 
-            p.x,
+    hitParticles
 
-            p.y,
+) {
 
-            3,
+    ctx.clearRect(
 
-            0,
+        0,
+        0,
 
-            Math.PI * 2
+        canvas.width,
+        canvas.height
 
-        );
+    );
 
-        ctx.fillStyle = "orange";
+    // WORLD
 
-        ctx.fill();
+    ctx.save();
 
-    }
+    ctx.translate(
+
+        -cameraX,
+        -cameraY
+
+    );
+
+    drawMap(ctx);
+
+    drawPlayers(ctx);
+
+    drawBullets(ctx);
+
+    drawParticles(
+
+        ctx,
+
+        hitParticles
+
+    );
+
+    ctx.restore();
+
+    // SCREEN SPACE
+
+    drawUI(ctx);
+
+    drawCrosshair(
+
+        ctx,
+
+        mouseX,
+        mouseY
+
+    );
 
 }

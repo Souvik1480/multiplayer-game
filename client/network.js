@@ -18,6 +18,7 @@ socket.onmessage = (event) => {
         JSON.parse(event.data);
 
     players = data.players;
+    console.log(Object.keys(players).length);
     bullets = data.bullets || [];
     particles=data.particles || [];
 };

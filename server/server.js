@@ -49,6 +49,16 @@ wss.on("connection", (ws) => {
 
     console.log("Client connected", id);
 
+    ws.send(
+        JSON.stringify({
+
+            type: "init",
+
+            id: id
+
+        })
+    );
+
     ws.on("message", (message) => {
 
         const input = JSON.parse(
@@ -157,11 +167,14 @@ setInterval(() => {
         // SHOOT
         if (p.shoot) {
 
+            const centerX = p.x + 25;
+            const centerY = p.y + 25;
+
             const dx =
-                p.mouseX - p.x;
+                p.mouseX - centerX;
 
             const dy =
-                p.mouseY - p.y;
+                p.mouseY - centerY;
 
             const len =
                 Math.sqrt(
@@ -169,23 +182,23 @@ setInterval(() => {
                     dy * dy
                 );
 
-            if (len > 0) {
-                p.angle = Math.atan2(dy, dx);
-            }
+            
 
             if (len > 0) {
+
+                p.angle = Math.atan2(dy, dx);
 
                 bullets.push({
 
                     owner: id,
 
                     x:
-                        p.x + 25 +
-                        dx / len * 40,
+                        centerX +
+                        (dx / len) * 40,
 
                     y:
-                        p.y + 25 +
-                        dy / len * 40,
+                        centerY +
+                        (dy / len) * 40,
 
                     vx:
                         dx / len * 25,
