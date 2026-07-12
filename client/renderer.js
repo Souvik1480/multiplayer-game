@@ -2,7 +2,7 @@ import { players, bullets, myId } from "./network.js";
 import { map, TILE_SIZE } from "./map.js";
 import { cameraX, cameraY } from "./camera.js";
 
-function drawMap(ctx) {
+function drawMap(ctx) {                                  //DRAWING THE MAP
 
     for (let row = 0; row < map.length; row++) {
 
@@ -29,7 +29,7 @@ function drawMap(ctx) {
 
 }
 
-function drawPlayers(ctx) {
+function drawPlayers(ctx) {                                //DRAWING THE PLAYERS
 
     for (const id in players) {
 
@@ -163,7 +163,7 @@ function drawPlayers(ctx) {
 
 }
 
-function drawBullets(ctx) {
+function drawBullets(ctx) {                                        //DRAWING THE BULLETS
 
     for (const b of bullets) {
 
@@ -189,7 +189,7 @@ function drawBullets(ctx) {
 
 }
 
-function drawParticles(ctx, hitParticles) {
+function drawParticles(ctx, hitParticles) {                              //DRAWING THE HIT PARTICLES
 
     for (const p of hitParticles) {
 
@@ -215,55 +215,134 @@ function drawParticles(ctx, hitParticles) {
 
 }
 
-function drawUI(ctx) {
+function drawHUD(ctx) {
+
+    const me = players[myId];
+
+    if (!me) return;
+
+    // Background
+    ctx.fillStyle = "rgba(0,0,0,0.65)";
+    ctx.fillRect(15, 15, 260, 130);
+
+    // Border
+    ctx.strokeStyle = "#666";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(15, 15, 260, 130);
 
     ctx.fillStyle = "white";
-    ctx.font = "20px Arial";
+
+    ctx.font = "22px Arial";
+    ctx.fillText("PLAYER HUD", 30, 45);
+
+    ctx.font = "18px Arial";
 
     ctx.fillText(
-
-        "Bullets: " + bullets.length,
-
-        20,
-        20
-
+        "🔫 Weapon : " + me.weapon.toUpperCase(),
+        30,
+        75
     );
 
-    let y = 60;
+    ctx.fillText(
+        "💥 Fire : " +
+        (me.weapon === "rifle" ? "AUTO" : "SEMI"),
+        30,
+        100
+    );
 
+    ctx.fillText(
+        "🎯 Bullets : " + bullets.length,
+        30,
+        125
+    );
+
+}
+
+function drawScoreboard(ctx) {
+
+    //Background
+    ctx.fillStyle = "rgba(0,0,0,0.65)";
+    ctx.fillRect(
+        ctx.canvas.width - 260,
+        15,
+        235,
+        170
+    );
+
+    //Border
+    ctx.strokeStyle = "#666";
+    ctx.lineWidth = 2;
+
+    ctx.strokeRect(
+        ctx.canvas.width - 250,
+        15,
+        235,
+        170
+    );
+
+    //Title
+    ctx.fillStyle = "white";
     ctx.font = "22px Arial";
 
     ctx.fillText(
 
         "🏆 SCOREBOARD",
 
-        20,
-        y
+        ctx.canvas.width - 235,
+
+        45
 
     );
 
-    y += 30;
+    let y = 80;
 
-    for (const id in players) {
+    ctx.font = "18px Arial";
+
+    const list =
+
+        Object.values(players)
+
+            .sort(
+
+                (a, b) =>
+
+                    b.kills - a.kills
+
+            );
+
+    for (const p of list) {
+
+        ctx.fillStyle ="white";
+
+        ctx.fillText(
+            p.name,
+            ctx.canvas.width - 235,
+            y
+        );
 
         ctx.fillText(
 
-            players[id].name +
-            " : " +
-            players[id].kills,
+            p.kills.toString(),
 
-            20,
+            ctx.canvas.width - 50,
+
             y
-
         );
-
-        y += 25;
+        y += 28;
 
     }
 
 }
 
-function drawCrosshair(ctx, mouseX, mouseY) {
+function drawUI(ctx) {                                                 //DRAWING THE UI
+
+    drawHUD(ctx);
+
+    drawScoreboard(ctx);
+
+}
+
+function drawCrosshair(ctx, mouseX, mouseY) {                          //DRAWING THE CROSSHAIR
 
     ctx.strokeStyle = "white";
 
@@ -326,7 +405,7 @@ function drawCrosshair(ctx, mouseX, mouseY) {
 
 }
 
-export function render(
+export function render(                             //RENDER
 
     ctx,
     canvas,
@@ -377,7 +456,7 @@ export function render(
 
     // SCREEN SPACE
 
-    drawUI(ctx);
+    drawUI(ctx, canvas);
 
     drawCrosshair(
 
