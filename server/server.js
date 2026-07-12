@@ -1,5 +1,13 @@
 const {
 
+    WEAPONS,
+
+    fireWeapon
+
+} = require("./weapons");
+
+const {
+
     MAP,
     TILE_SIZE
 
@@ -25,6 +33,9 @@ wss.on("connection", (ws) => {
 
         name: "Player" + id.slice(-3),
 
+        weapon: "pistol",
+        
+        lastShot: 0,
         kills: 0,
         respawn: 0,
 
@@ -80,6 +91,28 @@ wss.on("connection", (ws) => {
 
         p.mouseX = input.mouseX;
         p.mouseY = input.mouseY;
+
+        if (
+
+            input.weapon &&
+
+            input.weapon !== p.weapon
+
+        ) {
+
+            p.weapon = input.weapon;
+
+            console.log(
+
+                p.name,
+
+                "SWITCHED TO",
+
+                p.weapon
+
+            );
+
+        }
 
         if (input.shoot > 0) {
             p.shoot = true;
@@ -184,56 +217,33 @@ setInterval(() => {
         }
 
         // SHOOT
-        if (p.shoot) {
-
-            const centerX = p.x + 25;
-            const centerY = p.y + 25;
-
-            const dx =
-                p.mouseX - centerX;
-
-            const dy =
-                p.mouseY - centerY;
-
-            const len =
-                Math.sqrt(
-                    dx * dx +
-                    dy * dy
-                );
+        const weapon=WEAPONS[p.weapon];
 
 
+        if (p.shoot && Date.now()- p.lastShot>=weapon.fireRate) {
 
-            if (len > 0) {
+            fireWeapon(
 
-                p.angle = Math.atan2(dy, dx);
+                p,
 
-                bullets.push({
+                bullets,
 
-                    owner: id,
+                id
 
-                    x:
-                        centerX +
-                        (dx / len) * 40,
+            );
 
-                    y:
-                        centerY +
-                        (dy / len) * 40,
+            p.lastShot = Date.now();
 
-                    vx:
-                        dx / len * 25,
-
-                    vy:
-                        dy / len * 25
-                });
-
-                console.log(
-                    "BULLETS:",
-                    bullets.length
-                );
-            }
+            console.log(
+                "BULLETS:",
+                bullets.length
+            );
 
             p.shoot = false;
+
         }
+
+
     }
 
     // BULLET UPDATE
@@ -336,7 +346,7 @@ setInterval(() => {
                 p.hp =
                     Math.max(
                         0,
-                        p.hp - 10
+                        p.hp - b.damage
                     );
 
                 console.log(

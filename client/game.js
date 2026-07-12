@@ -3,11 +3,13 @@ import socket, { players, bullets } from "./network.js";
 import { map, TILE_SIZE } from "./map.js";
 import { render } from "./renderer.js";
 import { hitParticles, createHitEffect, updateParticles } from "./particles.js";
-import {updateCamera, cameraX, cameraY} from"./camera.js";
+import { updateCamera, cameraX, cameraY } from "./camera.js";
 
 let mouseX = 0;
 let mouseY = 0;
 let shootRequest = 0;
+let currentWeapon = "pistol";
+let shooting = false;
 
 window.addEventListener(
     "mousemove",
@@ -23,8 +25,18 @@ window.addEventListener(
     "mousedown",
     () => {
 
+        shooting = true;
         shootRequest++;
         createHitEffect(mouseX, mouseY);
+
+    }
+);
+
+window.addEventListener(
+    "mouseup",
+    () => {
+
+        shooting = false;
 
     }
 );
@@ -80,13 +92,32 @@ function sendInput() {
     if (socket.readyState !== WebSocket.OPEN)
         return;
 
-    const fire = shootRequest > 0;
+    let fire = false;
 
-    if (fire) {
+    // Pistol = one shot per click
+    if (currentWeapon === "pistol") {
 
-        shootRequest--;
+        fire = shootRequest > 0;
+
+        if (fire) {
+
+            shootRequest--;
+
+        }
 
     }
+
+    // Rifle = fire while holding mouse
+    else if (currentWeapon === "rifle") {
+
+        fire = shooting;
+
+    }
+    if (keys.one)
+        currentWeapon = "pistol";
+
+    if (keys.two)
+        currentWeapon = "rifle";
 
     socket.send(
 
@@ -97,11 +128,14 @@ function sendInput() {
             left: keys.a,
             right: keys.d,
 
-            mouseX:mouseX+cameraX,
-            mouseY:mouseY+cameraY,
+            mouseX: mouseX + cameraX,
+            mouseY: mouseY + cameraY,
 
-            shoot: fire
+            shoot: fire,
 
+
+            weapon:
+                currentWeapon
         })
 
     );
