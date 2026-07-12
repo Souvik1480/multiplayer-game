@@ -147,19 +147,38 @@ setInterval(() => {
 
         const size = 50;
 
-        const hitWall =
+        //X movement
 
-            isWall(newX, newY) ||
+        const hitWallX =
 
-            isWall(newX + size, newY) ||
+            isWall(newX, p.y) ||
 
-            isWall(newX, newY + size) ||
+            isWall(newX + size, p.y) ||
 
-            isWall(newX + size, newY + size);
+            isWall(newX, p.y + size) ||
 
-        if (!hitWall) {
+            isWall(newX + size, p.y + size);
+
+        if (!hitWallX) {
 
             p.x = newX;
+
+        }
+
+        //Y movement
+
+        const hitWallY =
+
+            isWall(p.x, newY) ||
+
+            isWall(p.x + size, newY) ||
+
+            isWall(p.x, newY + size) ||
+
+            isWall(p.x + size, newY + size);
+
+        if (!hitWallY) {
+
             p.y = newY;
 
         }
@@ -182,7 +201,7 @@ setInterval(() => {
                     dy * dy
                 );
 
-            
+
 
             if (len > 0) {
 
