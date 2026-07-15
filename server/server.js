@@ -34,7 +34,16 @@ wss.on("connection", (ws) => {
         name: "Player" + id.slice(-3),
 
         weapon: "pistol",
-        
+
+        ammo: {
+            pistol: 12,
+
+            rifle: 30
+        },
+
+        reloading: false,
+
+
         lastShot: 0,
         kills: 0,
         respawn: 0,
@@ -91,6 +100,8 @@ wss.on("connection", (ws) => {
 
         p.mouseX = input.mouseX;
         p.mouseY = input.mouseY;
+
+        p.reload = input.reload;
 
         if (
 
@@ -180,6 +191,8 @@ setInterval(() => {
 
         const size = 50;
 
+        const weapon = WEAPONS[p.weapon];
+
         //X movement
 
         const hitWallX =
@@ -216,11 +229,59 @@ setInterval(() => {
 
         }
 
-        // SHOOT
-        const weapon=WEAPONS[p.weapon];
+        //reloading
+
+        if (
+
+            p.reload &&
+
+            !p.reloading &&
+
+            p.ammo[p.weapon] < weapon.magazine
+
+        ) {
+
+            const reloadWeapon = p.weapon;
+
+            p.reloading = true;
+            p.reload = false;
+
+            console.log(
+                p.name,
+                "is reloading..."
+            );
+
+            setTimeout(() => {
+
+                p.ammo[reloadWeapon] =
+                    WEAPONS[reloadWeapon].magazine;
+
+                p.reloading = false;
+
+                console.log(
+                    p.name,
+                    "reloaded!"
+                );
+
+            }, WEAPONS[reloadWeapon].reloadTime);
+
+        }
+        
+        //shooting
 
 
-        if (p.shoot && Date.now()- p.lastShot>=weapon.fireRate) {
+
+        if (
+
+            p.shoot &&
+
+            !p.reloading &&
+
+            p.ammo[p.weapon] > 0 &&
+
+            Date.now() - p.lastShot >= weapon.fireRate
+
+        ) {
 
             fireWeapon(
 
@@ -231,6 +292,15 @@ setInterval(() => {
                 id
 
             );
+
+            console.log(
+                "SHOT WITH:",
+                p.weapon,
+                "AMMO:",
+                p.ammo[p.weapon]
+            );
+
+            p.ammo[p.weapon]--;
 
             p.lastShot = Date.now();
 

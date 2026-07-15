@@ -92,9 +92,34 @@ function sendInput() {
     if (socket.readyState !== WebSocket.OPEN)
         return;
 
+    // --------------------
+    // WEAPON SWITCH
+    // --------------------
+
+    if (keys.one && currentWeapon !== "pistol") {
+
+        currentWeapon = "pistol";
+
+        shooting = false;
+        shootRequest = 0;
+
+    }
+
+    if (keys.two && currentWeapon !== "rifle") {
+
+        currentWeapon = "rifle";
+
+        shooting = false;
+        shootRequest = 0;
+
+    }
+
+    // --------------------
+    // FIRE
+    // --------------------
+
     let fire = false;
 
-    // Pistol = one shot per click
     if (currentWeapon === "pistol") {
 
         fire = shootRequest > 0;
@@ -106,18 +131,11 @@ function sendInput() {
         }
 
     }
-
-    // Rifle = fire while holding mouse
     else if (currentWeapon === "rifle") {
 
         fire = shooting;
 
     }
-    if (keys.one)
-        currentWeapon = "pistol";
-
-    if (keys.two)
-        currentWeapon = "rifle";
 
     socket.send(
 
@@ -133,6 +151,7 @@ function sendInput() {
 
             shoot: fire,
 
+            reload: keys.reload,
 
             weapon:
                 currentWeapon

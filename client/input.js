@@ -1,34 +1,42 @@
 export const keys = {
-    w:false,
-    a:false,
-    s:false,
-    d:false,
+    w: false,
+    a: false,
+    s: false,
+    d: false,
 
-    one:false,
-    two:false
+    one: false,
+    two: false,
+
+    reload: false
 };
 
-window.addEventListener("keydown",(e)=>{
+window.addEventListener("keydown", (e) => {
 
-    if(e.key==="w") keys.w=true;
-    if(e.key==="a") keys.a=true;
-    if(e.key==="s") keys.s=true;
-    if(e.key==="d") keys.d=true;
+    const key = e.key.toLowerCase();
 
-    if(e.key==="1") keys.one=true;
-    if(e.key==="2") keys.two=true;
-    
-    console.log(keys);
+    if (key === "w") keys.w = true;
+    if (key === "a") keys.a = true;
+    if (key === "s") keys.s = true;
+    if (key === "d") keys.d = true;
+
+    if (e.key === "1") keys.one = true;
+    if (e.key === "2") keys.two = true;
+
+    if (key === "r") keys.reload = true;
 });
 
-window.addEventListener("keyup",(e)=>{
+window.addEventListener("keyup", (e) => {
 
-    if(e.key==="w") keys.w=false;
-    if(e.key==="a") keys.a=false;
-    if(e.key==="s") keys.s=false;
-    if(e.key==="d") keys.d=false;
+    const key = e.key.toLowerCase();
 
-    if(e.key==="1") keys.one=false;
-    if(e.key==="2") keys.two=false;
+    if (key === "w") keys.w = false;
+    if (key === "a") keys.a = false;
+    if (key === "s") keys.s = false;
+    if (key === "d") keys.d = false;
+
+    if (e.key === "1") keys.one = false;
+    if (e.key === "2") keys.two = false;
+
+    if (key === "r") keys.reload = false;
 
 });

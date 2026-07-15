@@ -250,10 +250,28 @@ function drawHUD(ctx) {
         100
     );
 
+    const maxAmmo =
+
+        me.weapon === "pistol"
+
+            ? 12
+
+            : 30;
+
     ctx.fillText(
-        "🎯 Bullets : " + bullets.length,
+
+        "🎯 Ammo : " +
+
+        me.ammo[me.weapon] +
+
+        " / " +
+
+        maxAmmo,
+
         30,
+
         125
+
     );
 
 }
@@ -312,7 +330,7 @@ function drawScoreboard(ctx) {
 
     for (const p of list) {
 
-        ctx.fillStyle ="white";
+        ctx.fillStyle = "white";
 
         ctx.fillText(
             p.name,

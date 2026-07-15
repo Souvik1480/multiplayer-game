@@ -10,7 +10,11 @@ const WEAPONS = {
 
         fireRate: 300,
 
-        bulletOffset: 40
+        bulletOffset: 40,
+        
+        magazine: 12,
+
+        reloadTime: 1200
 
     },
 
@@ -24,7 +28,11 @@ const WEAPONS = {
 
         fireRate: 100,
 
-        bulletOffset: 40
+        bulletOffset: 40,
+
+        magazine: 30,
+
+        reloadTime: 1800
 
     }
 
