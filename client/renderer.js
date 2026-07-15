@@ -1,6 +1,6 @@
 import { players, bullets, myId } from "./network.js";
 import { map, TILE_SIZE } from "./map.js";
-import { cameraX, cameraY } from "./camera.js";
+import { cameraX, cameraY, shakeX, shakeY } from "./camera.js";
 
 function drawMap(ctx) {                                  //DRAWING THE MAP
 
@@ -448,8 +448,8 @@ export function render(                             //RENDER
 
     ctx.translate(
 
-        -cameraX,
-        -cameraY
+        -cameraX + shakeX,
+        -cameraY + shakeY
 
     );
 

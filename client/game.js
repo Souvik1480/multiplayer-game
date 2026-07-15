@@ -2,7 +2,7 @@ import { keys } from "./input.js";
 import socket, { players, bullets } from "./network.js";
 import { map, TILE_SIZE } from "./map.js";
 import { render } from "./renderer.js";
-import { updateCamera, cameraX, cameraY } from "./camera.js";
+import { updateCamera, cameraX, cameraY, addCameraShake } from "./camera.js";
 
 let mouseX = 0;
 let mouseY = 0;
@@ -26,6 +26,8 @@ window.addEventListener(
 
         shooting = true;
         shootRequest++;
+
+        addCameraShake(5);
 
     }
 );
