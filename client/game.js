@@ -2,7 +2,6 @@ import { keys } from "./input.js";
 import socket, { players, bullets } from "./network.js";
 import { map, TILE_SIZE } from "./map.js";
 import { render } from "./renderer.js";
-import { hitParticles, createHitEffect, updateParticles } from "./particles.js";
 import { updateCamera, cameraX, cameraY } from "./camera.js";
 
 let mouseX = 0;
@@ -171,8 +170,6 @@ function gameLoop() {
 
     sendInput();
 
-    updateParticles();
-
     render(
 
         ctx,
@@ -182,8 +179,6 @@ function gameLoop() {
         mouseX,
 
         mouseY,
-
-        hitParticles
 
     );
 

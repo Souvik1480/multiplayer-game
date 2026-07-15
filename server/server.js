@@ -17,7 +17,6 @@ const WebSocket = require("ws");
 
 const players = {};
 const bullets = [];
-const particles = [];
 
 const wss = new WebSocket.Server({
     port: 8080
@@ -332,24 +331,6 @@ setInterval(() => {
 
         if (isWall(b.x, b.y)) {
 
-            for (let j = 0; j < 8; j++) {
-
-                particles.push({
-
-                    x: b.x,
-                    y: b.y,
-
-                    vx: (Math.random() - 0.5) * 5,
-                    vy: (Math.random() - 0.5) * 5,
-
-                    life: 20,
-
-                    color: "orange"
-
-                });
-
-            }
-
             bullets.splice(i, 1);
 
             continue;
@@ -508,44 +489,7 @@ setInterval(() => {
 
             bullets.splice(i, 1);
 
-            console.log("ADDING PARTICLE");
-
-            particles.push({
-
-                x: b.x,
-
-                y: b.y,
-
-                life: 20
-
-            });
-            console.log("Particle created:", particles.length);
         }
-    }
-
-    for (
-
-        let i =
-            particles.length - 1;
-
-        i >= 0;
-
-        i--
-
-    ) {
-
-        particles[i].life--;
-
-        if (
-
-            particles[i].life <= 0
-
-        ) {
-
-            particles.splice(i, 1);
-
-        }
-
     }
 
 }, 1000 / 60);
@@ -553,13 +497,11 @@ setInterval(() => {
 // SEND GAME STATE
 setInterval(() => {
 
-    // console.log("sending particles:", particles.length);
     const state =
         JSON.stringify({
 
             players,
-            bullets,
-            particles
+            bullets
 
         });
 

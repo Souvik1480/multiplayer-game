@@ -5,7 +5,6 @@ const socket = new WebSocket(
 export let players = {};
 export let bullets = [];
 export let myId = "";
-export let particles = [];
 
 socket.onopen = () => {
 
@@ -26,7 +25,7 @@ socket.onmessage = (event) => {
 
     players = data.players;
     bullets = data.bullets || [];
-    particles=data.particles || [];
+
 };
 
 socket.onerror = (err) => {

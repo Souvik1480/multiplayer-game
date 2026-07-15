@@ -189,32 +189,6 @@ function drawBullets(ctx) {                                        //DRAWING THE
 
 }
 
-function drawParticles(ctx, hitParticles) {                              //DRAWING THE HIT PARTICLES
-
-    for (const p of hitParticles) {
-
-        ctx.beginPath();
-
-        ctx.arc(
-
-            p.x,
-            p.y,
-
-            3,
-
-            0,
-            Math.PI * 2
-
-        );
-
-        ctx.fillStyle = "orange";
-
-        ctx.fill();
-
-    }
-
-}
-
 function drawHUD(ctx) {
 
     const me = players[myId];
@@ -431,7 +405,6 @@ export function render(                             //RENDER
     mouseX,
     mouseY,
 
-    hitParticles
 
 ) {
 
@@ -461,14 +434,6 @@ export function render(                             //RENDER
     drawPlayers(ctx);
 
     drawBullets(ctx);
-
-    drawParticles(
-
-        ctx,
-
-        hitParticles
-
-    );
 
     ctx.restore();
 
