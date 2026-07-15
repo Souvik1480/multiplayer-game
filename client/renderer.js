@@ -110,6 +110,30 @@ function drawPlayers(ctx) {                                //DRAWING THE PLAYERS
 
         );
 
+        // --------------------
+        // MUZZLE FLASH
+        // --------------------
+
+        if (p.flash > 0) {
+
+            ctx.fillStyle = "#FFD54F";
+
+            ctx.beginPath();
+
+            ctx.moveTo(42, 0);
+
+            ctx.lineTo(52, -4);
+
+            ctx.lineTo(60, 0);
+
+            ctx.lineTo(52, 4);
+
+            ctx.closePath();
+
+            ctx.fill();
+
+        }
+
         ctx.restore();
 
         ctx.fillStyle = "white";

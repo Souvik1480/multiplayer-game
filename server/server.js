@@ -47,6 +47,8 @@ wss.on("connection", (ws) => {
         kills: 0,
         respawn: 0,
 
+        flash: 0,
+
         hp: 100,
         alive: true,
 
@@ -170,6 +172,11 @@ setInterval(() => {
 
         const p = players[id];
 
+        if (p.flash > 0) {
+
+            p.flash--;
+        }
+
         if (!p.alive)
             continue;
 
@@ -265,7 +272,7 @@ setInterval(() => {
             }, WEAPONS[reloadWeapon].reloadTime);
 
         }
-        
+
         //shooting
 
 
@@ -291,6 +298,10 @@ setInterval(() => {
                 id
 
             );
+
+            p.flash = 3;
+
+            console.log("FLASH TRIGGERED");
 
             console.log(
                 "SHOT WITH:",

@@ -26,7 +26,6 @@ window.addEventListener(
 
         shooting = true;
         shootRequest++;
-        createHitEffect(mouseX, mouseY);
 
     }
 );
