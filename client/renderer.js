@@ -187,25 +187,45 @@ function drawPlayers(ctx) {                                //DRAWING THE PLAYERS
 
 }
 
-function drawBullets(ctx) {                                        //DRAWING THE BULLETS
+function drawBullets(ctx) {        // DRAWING THE BULLETS
 
     for (const b of bullets) {
+
+        // --------------------
+        // BULLET TRAIL
+        // --------------------
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            b.x - b.vx* 0.6,
+            b.y - b.vy* 0.6
+        );
+
+        ctx.lineTo(
+            b.x,
+            b.y
+        );
+
+        ctx.strokeStyle = "rgba(255, 220, 100, 0.8)";
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        // --------------------
+        // BULLET
+        // --------------------
 
         ctx.beginPath();
 
         ctx.arc(
-
             b.x,
             b.y,
-
-            8,
-
+            6,
             0,
             Math.PI * 2
-
         );
 
-        ctx.fillStyle = "red";
+        ctx.fillStyle = "#FFD54F";
 
         ctx.fill();
 

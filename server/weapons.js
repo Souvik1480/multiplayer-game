@@ -11,7 +11,7 @@ const WEAPONS = {
         fireRate: 300,
 
         bulletOffset: 40,
-        
+
         magazine: 12,
 
         reloadTime: 1200
@@ -88,14 +88,23 @@ function fireWeapon(player, bullets, ownerId) {
             Math.sin(angle) *
             weapon.bulletOffset,
 
+        // NEW
+        prevX:
+            centerX +
+            Math.cos(angle) *
+            weapon.bulletOffset,
+
+        prevY:
+            centerY +
+            Math.sin(angle) *
+            weapon.bulletOffset,
+
         vx:
             Math.cos(angle) *
-
             weapon.speed,
 
         vy:
             Math.sin(angle) *
-
             weapon.speed,
 
     });

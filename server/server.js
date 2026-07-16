@@ -334,8 +334,10 @@ setInterval(() => {
         i--
     ) {
 
-        const b =
-            bullets[i];
+        const b = bullets[i];
+
+        b.prevX = b.x;
+        b.prevY = b.y;
 
         b.x += b.vx;
         b.y += b.vy;
