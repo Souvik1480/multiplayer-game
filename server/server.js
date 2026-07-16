@@ -49,6 +49,8 @@ wss.on("connection", (ws) => {
 
         flash: 0,
 
+        hitMarker: 0,
+
         hp: 100,
         alive: true,
 
@@ -175,6 +177,12 @@ setInterval(() => {
         if (p.flash > 0) {
 
             p.flash--;
+        }
+
+        if (p.hitMarker > 0) {
+
+            p.hitMarker--;
+
         }
 
         if (!p.alive)
@@ -420,7 +428,14 @@ setInterval(() => {
                 );
 
                 hit = true;
-                console.log("HIT DETECTED");
+
+                const shooter = players[b.owner];
+
+                if (shooter) {
+
+                    shooter.hitMarker = 5;
+
+                }
 
                 // DEATH
                 if (
@@ -480,11 +495,33 @@ setInterval(() => {
 
                         deadPlayer.respawn = 0;
 
-                        deadPlayer.x =
-                            Math.random() * 800;
+                        let safe = false;
 
-                        deadPlayer.y =
-                            Math.random() * 600;
+                        while (!safe) {
+
+                            const x = Math.random() * 800;
+                            const y = Math.random() * 600;
+
+                            if (
+
+                                !isWall(x, y) &&
+
+                                !isWall(x + 50, y) &&
+
+                                !isWall(x, y + 50) &&
+
+                                !isWall(x + 50, y + 50)
+
+                            ) {
+
+                                deadPlayer.x = x;
+                                deadPlayer.y = y;
+
+                                safe = true;
+
+                            }
+
+                        }
 
                         console.log(
                             deadPlayer.name,

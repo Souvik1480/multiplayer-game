@@ -198,8 +198,8 @@ function drawBullets(ctx) {        // DRAWING THE BULLETS
         ctx.beginPath();
 
         ctx.moveTo(
-            b.x - b.vx* 0.6,
-            b.y - b.vy* 0.6
+            b.x - b.vx * 0.6,
+            b.y - b.vy * 0.6
         );
 
         ctx.lineTo(
@@ -376,6 +376,39 @@ function drawUI(ctx) {                                                 //DRAWING
 
     drawScoreboard(ctx);
 
+    // --------------------
+    // HIT MARKER
+    // --------------------
+
+    const me = players[myId];
+
+    if (me && me.hitMarker > 0) {
+
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 3;
+
+        const cx = ctx.canvas.width / 2;
+        const cy = ctx.canvas.height / 2;
+
+        const size = 12;
+
+        ctx.beginPath();
+
+        ctx.moveTo(cx - size, cy - size);
+        ctx.lineTo(cx - 3, cy - 3);
+
+        ctx.moveTo(cx + size, cy - size);
+        ctx.lineTo(cx + 3, cy - 3);
+
+        ctx.moveTo(cx - size, cy + size);
+        ctx.lineTo(cx - 3, cy + 3);
+
+        ctx.moveTo(cx + size, cy + size);
+        ctx.lineTo(cx + 3, cy + 3);
+
+        ctx.stroke();
+
+    }
 }
 
 function drawCrosshair(ctx, mouseX, mouseY) {                          //DRAWING THE CROSSHAIR
