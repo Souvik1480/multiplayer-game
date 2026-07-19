@@ -1,14 +1,16 @@
 import { keys } from "./input.js";
-import socket, { players, bullets } from "./network.js";
+import socket, { players, bullets, myId } from "./network.js";
 import { map, TILE_SIZE } from "./map.js";
 import { render } from "./renderer.js";
 import { updateCamera, cameraX, cameraY, addCameraShake } from "./camera.js";
+import { playPistol, playRifle } from "./sound.js";
 
 let mouseX = 0;
 let mouseY = 0;
 let shootRequest = 0;
 let currentWeapon = "pistol";
 let shooting = false;
+let lastRifleSound = 0;
 
 window.addEventListener(
     "mousemove",
@@ -87,6 +89,22 @@ function interpolate() {
     }
 }
 
+function canPlayLocalGunSound() {
+
+    const me = players[myId];
+
+    if (!me) return false;
+
+    return (
+
+        me.ammo[currentWeapon] > 0 &&
+
+        !me.reloading
+
+    );
+
+}
+
 function sendInput() {
 
     if (socket.readyState !== WebSocket.OPEN)
@@ -128,12 +146,32 @@ function sendInput() {
 
             shootRequest--;
 
+            if (canPlayLocalGunSound()) {
+
+                playPistol();
+
+            }
+
         }
 
     }
     else if (currentWeapon === "rifle") {
 
         fire = shooting;
+
+        if (fire && canPlayLocalGunSound()) {
+
+            const now = Date.now();
+
+            if (now - lastRifleSound >= 100) {
+
+                playRifle();
+
+                lastRifleSound = now;
+
+            }
+
+        }
 
     }
 

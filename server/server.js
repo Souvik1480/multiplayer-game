@@ -17,6 +17,7 @@ const WebSocket = require("ws");
 
 const players = {};
 const bullets = [];
+const soundEvents = [];
 
 const wss = new WebSocket.Server({
     port: 8080
@@ -258,6 +259,15 @@ setInterval(() => {
             const reloadWeapon = p.weapon;
 
             p.reloading = true;
+
+            soundEvents.push({
+
+                type: "reload",
+
+                player: id
+
+            });
+
             p.reload = false;
 
             console.log(
@@ -303,7 +313,9 @@ setInterval(() => {
 
                 bullets,
 
-                id
+                id,
+
+                soundEvents
 
             );
 
@@ -326,6 +338,32 @@ setInterval(() => {
                 "BULLETS:",
                 bullets.length
             );
+
+            p.shoot = false;
+
+        }
+
+        //Empty magazine
+
+
+
+        if (
+
+            p.shoot &&
+
+            !p.reloading &&
+
+            p.ammo[p.weapon] === 0
+
+        ) {
+
+            soundEvents.push({
+
+                type: "empty",
+
+                player: id
+
+            });
 
             p.shoot = false;
 
@@ -551,7 +589,8 @@ setInterval(() => {
         JSON.stringify({
 
             players,
-            bullets
+            bullets,
+            sounds: soundEvents
 
         });
 
@@ -569,5 +608,6 @@ setInterval(() => {
             }
         }
     );
+    soundEvents.length = 0;
 
 }, 1000 / 60);

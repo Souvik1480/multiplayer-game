@@ -38,7 +38,7 @@ const WEAPONS = {
 
 };
 
-function fireWeapon(player, bullets, ownerId) {
+function fireWeapon(player, bullets, ownerId, soundEvents) {
 
     console.log("FIRE WEAPON:", player.weapon);
 
@@ -109,12 +109,23 @@ function fireWeapon(player, bullets, ownerId) {
 
     });
 
+    soundEvents.push({
+
+        type: "gun",
+
+        weapon: player.weapon,
+
+        player: ownerId
+
+    });    
+    console.log("GUN SOUND EVENT:", player.weapon);
+
 }
 
 module.exports = {
 
-    WEAPONS,
+            WEAPONS,
 
-    fireWeapon
+            fireWeapon
 
-};
+        };
