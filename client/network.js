@@ -31,28 +31,43 @@ socket.onmessage = (event) => {
 
         switch (sound.type) {
 
-            case "gun":
+            case "gun": {
 
-                // Ignore our own shots.
-                // We already played them instantly in game.js.
-                if (sound.player === myId) {
+                // Don't play our own gun sound again
+                if (sound.player === myId) break;
 
-                    break;
+                const me = players[myId];
+                const shooter = players[sound.player];
 
-                }
+                if (!me || !shooter) break;
+
+                const dx = shooter.x - me.x;
+                const dy = shooter.y - me.y;
+
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                // Maximum hearing distance
+                const MAX_DISTANCE = 1000;
+
+                // Convert distance into volume
+                let volume = 1 - (distance / MAX_DISTANCE);
+
+                // Clamp between 0 and 1
+                volume = Math.max(0, Math.min(1, volume));
 
                 if (sound.weapon === "pistol") {
 
-                    playPistol();
+                    playPistol(volume);
 
                 }
                 else if (sound.weapon === "rifle") {
 
-                    playRifle();
+                    playRifle(volume);
 
                 }
 
                 break;
+            }
 
             case "reload":
 

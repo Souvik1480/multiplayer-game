@@ -13,21 +13,21 @@ empty.volume = 0.40;
 // FUNCTIONS
 // ----------
 
-export function playPistol() {
+export function playPistol(volume = 1) {
 
     const s = pistol.cloneNode();
 
-    s.volume = pistol.volume;
+    s.volume = pistol.volume * volume;
 
     s.play();
 
 }
 
-export function playRifle() {
+export function playRifle(volume = 1) {
 
     const s = rifle.cloneNode();
 
-    s.volume = rifle.volume;
+    s.volume = rifle.volume * volume;
 
     s.play();
 
