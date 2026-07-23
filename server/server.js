@@ -18,6 +18,7 @@ const WebSocket = require("ws");
 const players = {};
 const bullets = [];
 const soundEvents = [];
+const grenades = [];
 
 const wss = new WebSocket.Server({
     port: 8080
@@ -106,6 +107,7 @@ wss.on("connection", (ws) => {
         p.mouseY = input.mouseY;
 
         p.reload = input.reload;
+        p.grenade = input.grenade;
 
         if (
 
@@ -369,8 +371,42 @@ setInterval(() => {
 
         }
 
+        if (p.grenade) {
+
+            const dx = p.mouseX - (p.x + 25);
+            const dy = p.mouseY - (p.y + 25);
+
+            const len = Math.sqrt(dx * dx + dy * dy);
+
+            if (len > 0) {
+
+                grenades.push({
+
+                    owner: id,
+
+                    x: p.x + 25,
+
+                    y: p.y + 25,
+
+                    vx: (dx / len) * 8,
+
+                    vy: (dy / len) * 8,
+
+                    timer: 180     // 3 seconds @ 60 FPS
+
+                });
+
+            }
+
+            // Prevent creating 60 grenades while G is held
+            p.grenade = false;
+
+        }
+
 
     }
+
+
 
     // BULLET UPDATE
     for (
@@ -580,6 +616,69 @@ setInterval(() => {
         }
     }
 
+    for (let i = grenades.length - 1; i >= 0; i--) {
+
+        const g = grenades[i];
+
+        // Move
+        g.x += g.vx;
+        g.y += g.vy;
+
+        // Friction
+        g.vx *= 0.98;
+        g.vy *= 0.98;
+
+        g.timer--;
+
+        if (g.timer <= 0) {
+
+            console.log("💥 BOOM");
+
+            // Explosion radius
+            const RADIUS = 150;
+
+            // Damage every player inside the radius
+            for (const id in players) {
+
+                const p = players[id];
+
+                if (!p.alive) continue;
+
+                const dx = (p.x + 25) - g.x;
+                const dy = (p.y + 25) - g.y;
+
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance <= RADIUS) {
+
+                    p.hp = Math.max(0, p.hp - 60);
+
+                    console.log(
+                        p.name,
+                        "took grenade damage. HP:",
+                        p.hp
+                    );
+
+                }
+
+            }
+
+            soundEvents.push({
+
+                type: "explosion",
+
+                x: g.x,
+
+                y: g.y
+
+            });
+
+            grenades.splice(i, 1);
+
+        }
+
+    }
+
 }, 1000 / 60);
 
 // SEND GAME STATE
@@ -590,6 +689,7 @@ setInterval(() => {
 
             players,
             bullets,
+            grenades,
             sounds: soundEvents
 
         });

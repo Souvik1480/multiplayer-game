@@ -6,6 +6,7 @@ const socket = new WebSocket(
 export let players = {};
 export let bullets = [];
 export let myId = "";
+export let grenades = [];
 
 socket.onopen = () => {
 
@@ -26,6 +27,7 @@ socket.onmessage = (event) => {
 
     players = data.players;
     bullets = data.bullets || [];
+    grenades = data.grenades || [];
 
     for (const sound of data.sounds || []) {
 
@@ -86,6 +88,20 @@ socket.onmessage = (event) => {
                     playEmpty();
 
                 }
+
+                break;
+
+            case "explosion":
+
+                console.log(
+
+                    "💥 Explosion at",
+
+                    sound.x,
+
+                    sound.y
+
+                );
 
                 break;
 

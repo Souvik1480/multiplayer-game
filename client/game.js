@@ -191,8 +191,9 @@ function sendInput() {
 
             reload: keys.reload,
 
-            weapon:
-                currentWeapon
+            weapon: currentWeapon,
+
+            grenade: keys.grenade,
         })
 
     );

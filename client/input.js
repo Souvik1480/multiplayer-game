@@ -23,6 +23,7 @@ window.addEventListener("keydown", (e) => {
     if (e.key === "2") keys.two = true;
 
     if (key === "r") keys.reload = true;
+    if (key === "g") keys.grenade = true;
 });
 
 window.addEventListener("keyup", (e) => {
@@ -38,5 +39,6 @@ window.addEventListener("keyup", (e) => {
     if (e.key === "2") keys.two = false;
 
     if (key === "r") keys.reload = false;
+    if (key === "g") keys.grenade = false;
 
 });

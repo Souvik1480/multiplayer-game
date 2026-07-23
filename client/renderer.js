@@ -1,4 +1,4 @@
-import { players, bullets, myId } from "./network.js";
+import { players, bullets, grenades, myId } from "./network.js";
 import { map, TILE_SIZE } from "./map.js";
 import { cameraX, cameraY, shakeX, shakeY } from "./camera.js";
 
@@ -474,6 +474,34 @@ function drawCrosshair(ctx, mouseX, mouseY) {                          //DRAWING
 
 }
 
+function drawGrenades(ctx) {                         //GRENADE
+
+    for (const g of grenades) {
+
+        ctx.beginPath();
+
+        ctx.arc(
+
+            g.x,
+
+            g.y,
+
+            10,
+
+            0,
+
+            Math.PI * 2
+
+        );
+
+        ctx.fillStyle = "green";
+
+        ctx.fill();
+
+    }
+
+}
+
 export function render(                             //RENDER
 
     ctx,
@@ -511,6 +539,8 @@ export function render(                             //RENDER
     drawPlayers(ctx);
 
     drawBullets(ctx);
+
+    drawGrenades(ctx);
 
     ctx.restore();
 
