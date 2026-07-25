@@ -1,6 +1,7 @@
 import { players, bullets, grenades, myId } from "./network.js";
 import { map, TILE_SIZE } from "./map.js";
 import { cameraX, cameraY, shakeX, shakeY } from "./camera.js";
+import { explosions } from "./effects.js";
 
 function drawMap(ctx) {                                  //DRAWING THE MAP
 
@@ -502,6 +503,59 @@ function drawGrenades(ctx) {                         //GRENADE
 
 }
 
+function drawExplosions(ctx) {
+
+    for (const e of explosions) {
+
+        // Outer glow
+        ctx.beginPath();
+        ctx.arc(
+            e.x,
+            e.y,
+            e.radius,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fillStyle =
+            `rgba(255,80,0,${e.life / 20})`;
+
+        ctx.fill();
+
+        // Middle ring
+        ctx.beginPath();
+        ctx.arc(
+            e.x,
+            e.y,
+            e.radius * 0.7,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fillStyle =
+            `rgba(255,170,0,${e.life / 20})`;
+
+        ctx.fill();
+
+        // Bright core
+        ctx.beginPath();
+        ctx.arc(
+            e.x,
+            e.y,
+            e.radius * 0.35,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fillStyle =
+            `rgba(255,255,180,${e.life / 20})`;
+
+        ctx.fill();
+
+    }
+
+}
+
 export function render(                             //RENDER
 
     ctx,
@@ -541,6 +595,8 @@ export function render(                             //RENDER
     drawBullets(ctx);
 
     drawGrenades(ctx);
+
+    drawExplosions(ctx);
 
     ctx.restore();
 

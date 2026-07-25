@@ -1,3 +1,4 @@
+
 export const keys = {
     w: false,
     a: false,
@@ -7,7 +8,8 @@ export const keys = {
     one: false,
     two: false,
 
-    reload: false
+    reload: false,
+    grenadeRequest: false,
 };
 
 window.addEventListener("keydown", (e) => {
@@ -23,7 +25,7 @@ window.addEventListener("keydown", (e) => {
     if (e.key === "2") keys.two = true;
 
     if (key === "r") keys.reload = true;
-    if (key === "g") keys.grenade = true;
+    if (key === "g") keys.grenadeRequest = true;
 });
 
 window.addEventListener("keyup", (e) => {
@@ -39,6 +41,6 @@ window.addEventListener("keyup", (e) => {
     if (e.key === "2") keys.two = false;
 
     if (key === "r") keys.reload = false;
-    if (key === "g") keys.grenade = false;
+    if (key === "g") keys.grenadeRequest = false;
 
 });

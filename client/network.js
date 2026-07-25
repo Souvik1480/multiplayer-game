@@ -1,4 +1,6 @@
-import { playPistol, playRifle, playReload, playEmpty } from "./sound.js";
+import { playPistol, playRifle, playReload, playEmpty, playExplosion } from "./sound.js";
+import { createExplosion } from "./effects.js";
+import { addCameraShake } from "./camera.js";
 const socket = new WebSocket(
     "ws://127.0.0.1:8080"
 );
@@ -28,6 +30,10 @@ socket.onmessage = (event) => {
     players = data.players;
     bullets = data.bullets || [];
     grenades = data.grenades || [];
+
+    if (data.sounds && data.sounds.length > 0) {
+
+    }
 
     for (const sound of data.sounds || []) {
 
@@ -91,19 +97,36 @@ socket.onmessage = (event) => {
 
                 break;
 
-            case "explosion":
+            case "explosion": {
 
-                console.log(
-
-                    "💥 Explosion at",
-
+                createExplosion(
                     sound.x,
-
                     sound.y
-
                 );
 
+                const me = players[myId];
+
+                if (me) {
+
+                    const dx = (me.x + 25) - sound.x;
+                    const dy = (me.y + 25) - sound.y;
+
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    const MAX_DISTANCE = 1000;
+
+                    const volume = Math.max(
+                        0,
+                        1 - distance / MAX_DISTANCE
+                    );
+
+                    if (volume > 0) {
+                        playExplosion(volume);
+                    }
+                }
+
                 break;
+            }
 
         }
 

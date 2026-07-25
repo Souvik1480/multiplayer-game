@@ -107,7 +107,9 @@ wss.on("connection", (ws) => {
         p.mouseY = input.mouseY;
 
         p.reload = input.reload;
-        p.grenade = input.grenade;
+        if (input.grenade && !p.grenade) {
+            p.grenade = true;
+        }
 
         if (
 
@@ -396,6 +398,8 @@ setInterval(() => {
 
                 });
 
+                console.log("GRENADE CREATED");
+
             }
 
             // Prevent creating 60 grenades while G is held
@@ -632,8 +636,6 @@ setInterval(() => {
 
         if (g.timer <= 0) {
 
-            console.log("💥 BOOM");
-
             // Explosion radius
             const RADIUS = 150;
 
@@ -651,12 +653,20 @@ setInterval(() => {
 
                 if (distance <= RADIUS) {
 
-                    p.hp = Math.max(0, p.hp - 60);
+                    const damage = Math.round(
+                        80 * (1 - distance / RADIUS)
+                    );
+
+                    p.hp = Math.max(
+                        0,
+                        p.hp - damage
+                    );
 
                     console.log(
                         p.name,
-                        "took grenade damage. HP:",
-                        p.hp
+                        "took",
+                        damage,
+                        "grenade damage."
                     );
 
                 }

@@ -4,6 +4,7 @@ import { map, TILE_SIZE } from "./map.js";
 import { render } from "./renderer.js";
 import { updateCamera, cameraX, cameraY, addCameraShake } from "./camera.js";
 import { playPistol, playRifle } from "./sound.js";
+import { updateEffects } from "./effects.js";
 
 let mouseX = 0;
 let mouseY = 0;
@@ -11,6 +12,7 @@ let shootRequest = 0;
 let currentWeapon = "pistol";
 let shooting = false;
 let lastRifleSound = 0;
+let grenadeRequest = false;
 
 window.addEventListener(
     "mousemove",
@@ -54,8 +56,7 @@ canvas.height = window.innerHeight;
 
 function update() {
 
-    // Server-authoritative movement.
-    // Client only sends inputs.
+    updateEffects();
 
 }
 
@@ -175,8 +176,12 @@ function sendInput() {
 
     }
 
-    socket.send(
+    const grenade = keys.grenadeRequest;
 
+    // Consume the request so it's sent only once
+    keys.grenadeRequest = false;
+
+    socket.send(
         JSON.stringify({
 
             up: keys.w,
@@ -193,9 +198,9 @@ function sendInput() {
 
             weapon: currentWeapon,
 
-            grenade: keys.grenade,
-        })
+            grenade: grenade
 
+        })
     );
 
 }
