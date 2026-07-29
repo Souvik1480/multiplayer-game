@@ -1,9 +1,10 @@
-import { players, bullets, grenades, myId } from "./network.js";
+import { players, bullets, grenades, killFeed, myId } from "./network.js";
 import { map, TILE_SIZE } from "./map.js";
 import { cameraX, cameraY, shakeX, shakeY } from "./camera.js";
 import { explosions } from "./effects.js";
 
-function drawMap(ctx) {                                  //DRAWING THE MAP
+
+function drawMap(ctx) {                              //MAP
 
     for (let row = 0; row < map.length; row++) {
 
@@ -30,7 +31,7 @@ function drawMap(ctx) {                                  //DRAWING THE MAP
 
 }
 
-function drawPlayers(ctx) {                                //DRAWING THE PLAYERS
+function drawPlayers(ctx) {                          //PLAYERS
 
     for (const id in players) {
 
@@ -188,7 +189,7 @@ function drawPlayers(ctx) {                                //DRAWING THE PLAYERS
 
 }
 
-function drawBullets(ctx) {        // DRAWING THE BULLETS
+function drawBullets(ctx) {                          //BULLETS
 
     for (const b of bullets) {
 
@@ -234,7 +235,7 @@ function drawBullets(ctx) {        // DRAWING THE BULLETS
 
 }
 
-function drawHUD(ctx) {
+function drawHUD(ctx) {                              //HUD
 
     const me = players[myId];
 
@@ -295,7 +296,7 @@ function drawHUD(ctx) {
 
 }
 
-function drawScoreboard(ctx) {
+function drawScoreboard(ctx) {                       //SCOREBOARD
 
     //Background
     ctx.fillStyle = "rgba(0,0,0,0.65)";
@@ -370,7 +371,7 @@ function drawScoreboard(ctx) {
     }
 }
 
-function drawUI(ctx) {                                                 //DRAWING THE UI
+function drawUI(ctx) {                               //UI
 
     drawHUD(ctx);
 
@@ -411,7 +412,7 @@ function drawUI(ctx) {                                                 //DRAWING
     }
 }
 
-function drawCrosshair(ctx, mouseX, mouseY) {                          //DRAWING THE CROSSHAIR
+function drawCrosshair(ctx, mouseX, mouseY) {        //CROSSHAIR
 
     ctx.strokeStyle = "white";
 
@@ -502,7 +503,7 @@ function drawGrenades(ctx) {                         //GRENADE
 
 }
 
-function drawExplosions(ctx) {
+function drawExplosions(ctx) {                       //EXPLOSION
 
     for (const e of explosions) {
 
@@ -555,7 +556,71 @@ function drawExplosions(ctx) {
 
 }
 
-export function render(                             //RENDER
+/*function drawKillFeed(ctx) {                         //KILL FEED
+
+    ctx.save();
+
+    ctx.font = "18px Arial";
+    ctx.textAlign = "right";
+
+    let y = 40;
+
+    for (const kill of killFeed) {
+
+        let icon = "🔫";
+
+        if (kill.weapon === "grenade")
+            icon = "💣";
+
+        ctx.fillStyle = "white";
+
+        ctx.fillText(
+            `${kill.killer} ${icon} ${kill.victim}`,
+            ctx.canvas.width - 20,
+            y
+        );
+
+        y += 26;
+    }
+
+    ctx.restore();
+
+}*/
+
+function drawKillFeed(ctx) {
+
+    ctx.save();
+
+    ctx.font = "18px Arial";
+    ctx.textAlign = "left";
+
+    let y = ctx.canvas.height - 30;
+
+    // Draw newest kill at the bottom
+    for (let i = killFeed.length - 1; i >= 0; i--) {
+
+        const kill = killFeed[i];
+
+        let icon = "🔫";
+
+        if (kill.weapon === "grenade")
+            icon = "💣";
+
+        ctx.fillStyle = "white";
+
+        ctx.fillText(
+            `${kill.killer} ${icon} ${kill.victim}`,
+            20,
+            y
+        );
+
+        y -= 26;
+    }
+
+    ctx.restore();
+}
+
+export function render(                                  //RENDER
 
     ctx,
     canvas,
@@ -602,6 +667,8 @@ export function render(                             //RENDER
     // SCREEN SPACE
 
     drawUI(ctx, canvas);
+
+    drawKillFeed(ctx);
 
     drawCrosshair(
 

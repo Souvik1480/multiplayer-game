@@ -9,6 +9,7 @@ export let players = {};
 export let bullets = [];
 export let myId = "";
 export let grenades = [];
+export let killFeed = [];
 
 socket.onopen = () => {
 
@@ -23,14 +24,20 @@ socket.onmessage = (event) => {
 
     if (data.type === "init") {
         myId = data.id;
-        console.log("MY ID:", myId)
         return;
     }
 
-    players = data.players;
-    bullets = data.bullets || [];
-    grenades = data.grenades || [];
-    console.log(players);
+    Object.keys(players).forEach(key => delete players[key]);
+    Object.assign(players, data.players);
+
+    bullets.length = 0;
+    bullets.push(...(data.bullets || []));
+
+    grenades.length = 0;
+    grenades.push(...(data.grenades || []));
+
+    killFeed.length = 0;
+    killFeed.push(...(data.killFeed || []));
 
     if (data.sounds && data.sounds.length > 0) {
 

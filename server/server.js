@@ -19,6 +19,7 @@ const players = {};
 const bullets = [];
 const soundEvents = [];
 const grenades = [];
+const killFeed = [];
 
 const wss = new WebSocket.Server({
     port: 8080
@@ -92,10 +93,6 @@ wss.on("connection", (ws) => {
         const input = JSON.parse(
             message.toString()
         );
-
-        if (input.shoot) {
-            console.log("SERVER SHOT");
-        }
 
         const p = players[id];
 
@@ -175,7 +172,7 @@ function bulletHitWall(x, y) {
 
 }
 
-setInterval(() => {
+setInterval(() => {        //main game loop
 
     // PLAYER UPDATE
     for (const id in players) {
@@ -336,19 +333,11 @@ setInterval(() => {
 
                 p.reloading = false;
 
-                console.log(
-                    p.name,
-                    "reloaded!"
-                );
-
             }, WEAPONS[reloadWeapon].reloadTime);
 
         }
 
         //shooting
-
-
-
         if (
 
             p.shoot &&
@@ -375,32 +364,15 @@ setInterval(() => {
 
             p.flash = 3;
 
-            console.log("FLASH TRIGGERED");
-
-            console.log(
-                "SHOT WITH:",
-                p.weapon,
-                "AMMO:",
-                p.ammo[p.weapon]
-            );
-
             p.ammo[p.weapon]--;
 
             p.lastShot = Date.now();
-
-            console.log(
-                "BULLETS:",
-                bullets.length
-            );
 
             p.shoot = false;
 
         }
 
         //Empty magazine
-
-
-
         if (
 
             p.shoot &&
@@ -447,8 +419,6 @@ setInterval(() => {
                     timer: 180     // 3 seconds @ 60 FPS
 
                 });
-
-                console.log("GRENADE CREATED");
 
             }
 
@@ -562,20 +532,14 @@ setInterval(() => {
 
                         players[b.owner].kills++;
 
-                        console.log(
-                            "KILL:",
-                            players[b.owner].name,
-                            "Kills:",
-                            players[b.owner].kills
-                        );
+                        killFeed.unshift({
+                            killer: players[b.owner].name,
+                            victim: p.name,
+                            weapon: b.weapon,
+                            timer: 300
+                        });
                     }
                 }
-
-                console.log(
-                    p.name,
-                    "HP:",
-                    p.hp
-                );
 
                 hit = true;
 
@@ -600,7 +564,7 @@ setInterval(() => {
     }
 
 
-
+    // GRENADE UPDATE
     for (let i = grenades.length - 1; i >= 0; i--) {
 
         const g = grenades[i];
@@ -655,22 +619,15 @@ setInterval(() => {
                         //Award the kill
                         if (players[g.owner]) {
                             players[g.owner].kills++;
+
+                            killFeed.unshift({
+                                killer: players[g.owner].name,
+                                victim: p.name,
+                                weapon: "grenade",
+                                timer: 300
+                            });
                         }
-
-                        console.log(
-                            "KILL:",
-                            players[g.owner].name,
-                            "Kills:",
-                            players[g.owner].kills
-                        );
                     }
-
-                    console.log(
-                        p.name,
-                        "took",
-                        damage,
-                        "grenade damage."
-                    );
 
                 }
 
@@ -692,6 +649,19 @@ setInterval(() => {
 
     }
 
+    //KILL FEED TIMER
+    for (let i = killFeed.length - 1; i >= 0; i--) {
+
+        killFeed[i].timer--;
+
+        if (killFeed[i].timer <= 0) {
+
+            killFeed.splice(i, 1);
+
+        }
+
+    }
+
 }, 1000 / 60);
 
 // SEND GAME STATE
@@ -703,7 +673,8 @@ setInterval(() => {
             players,
             bullets,
             grenades,
-            sounds: soundEvents
+            sounds: soundEvents,
+            killFeed
 
         });
 
