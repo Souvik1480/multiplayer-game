@@ -46,8 +46,11 @@ wss.on("connection", (ws) => {
 
 
         lastShot: 0,
+
         kills: 0,
-        respawn: 0,
+        deaths: 0,
+
+        respawnTimer: 0,
 
         flash: 0,
 
@@ -188,6 +191,53 @@ setInterval(() => {
 
             p.hitMarker--;
 
+        }
+
+        if (!p.alive) {
+
+            p.respawnTimer--;
+
+            if (p.respawnTimer <= 0) {
+
+                p.alive = true;
+
+                p.hp = 100;
+
+                p.weapon = "pistol";
+
+                p.ammo.pistol = 12;
+                p.ammo.rifle = 30;
+
+                let safe = false;
+
+                while (!safe) {
+
+                    const x = Math.random() * 800;
+                    const y = Math.random() * 600;
+
+                    if (
+
+                        !isWall(x, y) &&
+
+                        !isWall(x + 50, y) &&
+
+                        !isWall(x, y + 50) &&
+
+                        !isWall(x + 50, y + 50)
+
+                    ) {
+
+                        p.x = x;
+                        p.y = y;
+
+                        safe = true;
+                    }
+                }
+
+                console.log(p.name, "RESPAWNED");
+            }
+
+            continue;
         }
 
         if (!p.alive)
@@ -493,11 +543,33 @@ setInterval(() => {
 
             ) {
 
-                p.hp =
-                    Math.max(
-                        0,
-                        p.hp - b.damage
-                    );
+                p.hp = Math.max(
+                    0,
+                    p.hp - b.damage
+                );
+
+                // Check if the player just died
+                if (p.hp <= 0 && p.alive) {
+
+
+                    p.alive = false;
+
+                    p.deaths++;
+
+                    p.respawnTimer = 300;
+
+                    if (players[b.owner]) {
+
+                        players[b.owner].kills++;
+
+                        console.log(
+                            "KILL:",
+                            players[b.owner].name,
+                            "Kills:",
+                            players[b.owner].kills
+                        );
+                    }
+                }
 
                 console.log(
                     p.name,
@@ -515,100 +587,6 @@ setInterval(() => {
 
                 }
 
-                // DEATH
-                if (
-                    p.hp === 0 &&
-                    p.alive
-                ) {
-
-                    const killer =
-                        players[b.owner];
-
-                    if (killer) {
-
-                        killer.kills++;
-
-                        console.log(
-
-                            killer.name,
-
-                            "KILLS:",
-
-                            killer.kills
-                        );
-                    }
-
-                    p.alive = false;
-
-                    const deadPlayer = p;
-
-                    deadPlayer.respawn = 5;
-
-                    const timer =
-                        setInterval(() => {
-
-                            deadPlayer.respawn--;
-
-                            if (
-                                deadPlayer.respawn <= 0
-                            ) {
-
-                                clearInterval(
-                                    timer
-                                );
-                            }
-
-                        }, 1000);
-
-                    console.log(
-                        deadPlayer.name,
-                        "DIED"
-                    );
-
-                    setTimeout(() => {
-
-                        deadPlayer.hp = 100;
-
-                        deadPlayer.alive = true;
-
-                        deadPlayer.respawn = 0;
-
-                        let safe = false;
-
-                        while (!safe) {
-
-                            const x = Math.random() * 800;
-                            const y = Math.random() * 600;
-
-                            if (
-
-                                !isWall(x, y) &&
-
-                                !isWall(x + 50, y) &&
-
-                                !isWall(x, y + 50) &&
-
-                                !isWall(x + 50, y + 50)
-
-                            ) {
-
-                                deadPlayer.x = x;
-                                deadPlayer.y = y;
-
-                                safe = true;
-
-                            }
-
-                        }
-
-                        console.log(
-                            deadPlayer.name,
-                            "RESPAWNED"
-                        );
-
-                    }, 5000);
-                }
-
                 break;
             }
         }
@@ -618,7 +596,10 @@ setInterval(() => {
             bullets.splice(i, 1);
 
         }
+
     }
+
+
 
     for (let i = grenades.length - 1; i >= 0; i--) {
 
@@ -661,6 +642,28 @@ setInterval(() => {
                         0,
                         p.hp - damage
                     );
+
+                    //Player died?
+                    if (p.hp <= 0 && p.alive) {
+
+                        p.alive = false;
+
+                        p.deaths++;
+
+                        p.respawnTimer = 300;
+
+                        //Award the kill
+                        if (players[g.owner]) {
+                            players[g.owner].kills++;
+                        }
+
+                        console.log(
+                            "KILL:",
+                            players[g.owner].name,
+                            "Kills:",
+                            players[g.owner].kills
+                        );
+                    }
 
                     console.log(
                         p.name,

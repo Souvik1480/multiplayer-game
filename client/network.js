@@ -30,6 +30,7 @@ socket.onmessage = (event) => {
     players = data.players;
     bullets = data.bullets || [];
     grenades = data.grenades || [];
+    console.log(players);
 
     if (data.sounds && data.sounds.length > 0) {
 

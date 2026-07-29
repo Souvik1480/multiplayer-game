@@ -368,7 +368,6 @@ function drawScoreboard(ctx) {
         y += 28;
 
     }
-
 }
 
 function drawUI(ctx) {                                                 //DRAWING THE UI
