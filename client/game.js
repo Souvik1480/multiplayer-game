@@ -1,5 +1,50 @@
 import { keys } from "./input.js";
-import socket, { players } from "./network.js";
+import socket, { players, bullets, myId } from "./network.js";
+import { map, TILE_SIZE } from "./map.js";
+import { render } from "./renderer.js";
+import { updateCamera, cameraX, cameraY, addCameraShake } from "./camera.js";
+import { playPistol, playRifle } from "./sound.js";
+import { updateEffects } from "./effects.js";
+
+let mouseX = 0;
+let mouseY = 0;
+let shootRequest = 0;
+let currentWeapon = "pistol";
+let shooting = false;
+let lastRifleSound = 0;
+let grenadeRequest = false;
+
+window.addEventListener(
+    "mousemove",
+    (e) => {
+
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    }
+)
+
+
+window.addEventListener(
+    "mousedown",
+    () => {
+
+        shooting = true;
+        shootRequest++;
+
+        addCameraShake(5);
+
+    }
+);
+
+window.addEventListener(
+    "mouseup",
+    () => {
+
+        shooting = false;
+
+    }
+);
+
 
 console.log("GAME.JS LOADED");
 
@@ -9,50 +54,25 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-function update(){
+function update() {
 
-    if(keys.w) player.y -= player.speed;
-    if(keys.s) player.y += player.speed;
-    if(keys.a) player.x -= player.speed;
-    if(keys.d) player.x += player.speed;
+    updateEffects();
+
 }
 
-function render() {
 
-    ctx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
+function interpolate() {
 
     for (const id in players) {
-
-        const p = players[id];
-
-        ctx.fillStyle = "gold";
-
-        ctx.fillRect(
-            p.x,
-            p.y,
-            50,
-            50
-        );
-    }
-}
-
-function interpolate(){
-
-    for(const id in players){
 
         const p =
             players[id];
 
-        if(
+        if (
             p.targetX ===
-                undefined ||
+            undefined ||
             p.targetY ===
-                undefined
+            undefined
         )
             continue;
 
@@ -70,27 +90,142 @@ function interpolate(){
     }
 }
 
+function canPlayLocalGunSound() {
+
+    const me = players[myId];
+
+    if (!me) return false;
+
+    return (
+
+        me.ammo[currentWeapon] > 0 &&
+
+        !me.reloading
+
+    );
+
+}
+
+function sendInput() {
+
+    if (socket.readyState !== WebSocket.OPEN)
+        return;
+
+    // --------------------
+    // WEAPON SWITCH
+    // --------------------
+
+    if (keys.one && currentWeapon !== "pistol") {
+
+        currentWeapon = "pistol";
+
+        shooting = false;
+        shootRequest = 0;
+
+    }
+
+    if (keys.two && currentWeapon !== "rifle") {
+
+        currentWeapon = "rifle";
+
+        shooting = false;
+        shootRequest = 0;
+
+    }
+
+    // --------------------
+    // FIRE
+    // --------------------
+
+    let fire = false;
+
+    if (currentWeapon === "pistol") {
+
+        fire = shootRequest > 0;
+
+        if (fire) {
+
+            shootRequest--;
+
+            if (canPlayLocalGunSound()) {
+
+                playPistol();
+
+            }
+
+        }
+
+    }
+    else if (currentWeapon === "rifle") {
+
+        fire = shooting;
+
+        if (fire && canPlayLocalGunSound()) {
+
+            const now = Date.now();
+
+            if (now - lastRifleSound >= 100) {
+
+                playRifle();
+
+                lastRifleSound = now;
+
+            }
+
+        }
+
+    }
+
+    const grenade = keys.grenadeRequest;
+
+    // Consume the request so it's sent only once
+    keys.grenadeRequest = false;
+
+    socket.send(
+        JSON.stringify({
+
+            up: keys.w,
+            down: keys.s,
+            left: keys.a,
+            right: keys.d,
+
+            mouseX: mouseX + cameraX,
+            mouseY: mouseY + cameraY,
+
+            shoot: fire,
+
+            reload: keys.reload,
+
+            weapon: currentWeapon,
+
+            grenade: grenade
+
+        })
+    );
+
+}
+
 function gameLoop() {
 
     update();
 
-    //interpolate();
+    interpolate();
 
-    if (socket.readyState === WebSocket.OPEN) {
+    updateCamera(players);
 
-        socket.send(
-            JSON.stringify({
+    sendInput();
 
-                up: keys.w,
-                down: keys.s,
-                left: keys.a,
-                right: keys.d
+    render(
 
-            })
-        );
-    }
+        ctx,
 
-    render();
+        canvas,
+
+        mouseX,
+
+        mouseY,
+
+    );
 
     requestAnimationFrame(gameLoop);
 }
