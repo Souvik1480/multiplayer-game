@@ -596,10 +596,15 @@ function drawHealthPacks(ctx) {                      //HEALTH PACKS
         if (!hp.active)
             continue;
 
-        const x = hp.x;
+        const baseSize = 30;
+
         const floatOffset = Math.sin(Date.now() / 300 + hp.id) * 4;
-        const y = hp.y + floatOffset;
-        const size = 30;
+
+        const pulse = 1 + Math.sin(Date.now() / 200 + hp.id) * 0.08;
+        const size = baseSize * pulse;
+
+        const x = hp.x - (size - baseSize) / 2;
+        const y = hp.y + floatOffset - (size - baseSize) / 2;
 
         // -------------------------
         // Glow
