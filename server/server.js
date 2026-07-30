@@ -710,6 +710,24 @@ setInterval(() => {        //main game loop
 
     }
 
+    // HEALTH PACK RESPAWN
+    for (const hp of healthPacks) {
+
+        if (hp.active)
+            continue;
+
+        hp.respawnTimer--;
+
+        if (hp.respawnTimer <= 0) {
+
+            hp.active = true;
+
+            hp.respawnTimer = 0;
+
+        }
+
+    }
+
     //KILL FEED TIMER
     for (let i = killFeed.length - 1; i >= 0; i--) {
 
