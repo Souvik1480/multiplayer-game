@@ -596,25 +596,60 @@ function drawHealthPacks(ctx) {                      //HEALTH PACKS
         if (!hp.active)
             continue;
 
-        // Green box
+        const x = hp.x;
+        const floatOffset = Math.sin(Date.now() / 300 + hp.id) * 4;
+        const y = hp.y + floatOffset;
+        const size = 30;
+
+        // -------------------------
+        // Glow
+        // -------------------------
+        ctx.beginPath();
+        ctx.fillStyle = "rgba(0,255,120,0.20)";
+        ctx.arc(
+            x + size / 2,
+            y + size / 2,
+            26,
+            0,
+            Math.PI * 2
+        );
+        ctx.fill();
+
+        // -------------------------
+        // Main box
+        // -------------------------
         ctx.fillStyle = "#32CD32";
-        ctx.fillRect(hp.x, hp.y, 30, 30);
 
-        // White border
-        ctx.strokeStyle = "white";
+        ctx.beginPath();
+        ctx.roundRect(
+            x,
+            y,
+            size,
+            size,
+            6
+        );
+        ctx.fill();
+
+        // -------------------------
+        // Border
+        // -------------------------
         ctx.lineWidth = 2;
-        ctx.strokeRect(hp.x, hp.y, 30, 30);
+        ctx.strokeStyle = "white";
+        ctx.stroke();
 
-        // White +
-        ctx.fillStyle = "white";
-        ctx.font = "22px Arial";
+        // -------------------------
+        // Heart
+        // -------------------------
+        ctx.font = "18px Arial";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
+        ctx.fillStyle = "white";
+
         ctx.fillText(
-            "+",
-            hp.x + 15,
-            hp.y + 15
+            "❤",
+            x + size / 2,
+            y + size / 2 + 1
         );
     }
 
