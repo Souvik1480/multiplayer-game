@@ -417,6 +417,7 @@ setInterval(() => {        //main game loop
 
         }
 
+        //Grenades
         if (p.grenade) {
 
             const dx = p.mouseX - (p.x + 25);
@@ -446,7 +447,45 @@ setInterval(() => {        //main game loop
 
             // Prevent creating 60 grenades while G is held
             p.grenade = false;
+        }
 
+        //Pickup detection
+        for (const id in players) {
+
+            const player = players[id];
+
+            if (!player.alive)
+                continue;
+
+            for (const hp of healthPacks) {
+
+                if (!hp.active)
+                    continue;
+
+                // Don't consume a health pack if already full HP
+                if (player.hp >= 100)
+                    continue;
+
+                const playerCenterX = player.x + 25;
+                const playerCenterY = player.y + 25;
+
+                const healthCenterX = hp.x + 15;
+                const healthCenterY = hp.y + 15;
+
+                const dx = playerCenterX - healthCenterX;
+                const dy = playerCenterY - healthCenterY;
+
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < 30) {
+
+                    player.hp = Math.min(100, player.hp + hp.amount);
+
+                    hp.active = false;
+
+                    hp.respawnTimer = 600; // ~10 seconds at 60 FPS
+                }
+            }
         }
 
 
