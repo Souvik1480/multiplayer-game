@@ -10,6 +10,7 @@ export let bullets = [];
 export let myId = "";
 export let grenades = [];
 export let killFeed = [];
+export let healthPacks = [];
 
 socket.onopen = () => {
 
@@ -38,6 +39,9 @@ socket.onmessage = (event) => {
 
     killFeed.length = 0;
     killFeed.push(...(data.killFeed || []));
+
+    healthPacks.length = 0;
+    healthPacks.push(...(data.healthPacks || []));
 
     if (data.sounds && data.sounds.length > 0) {
 

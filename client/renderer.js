@@ -1,4 +1,4 @@
-import { players, bullets, grenades, killFeed, myId } from "./network.js";
+import { players, bullets, grenades, killFeed, healthPacks, myId } from "./network.js";
 import { map, TILE_SIZE } from "./map.js";
 import { cameraX, cameraY, shakeX, shakeY } from "./camera.js";
 import { explosions } from "./effects.js";
@@ -556,38 +556,7 @@ function drawExplosions(ctx) {                       //EXPLOSION
 
 }
 
-/*function drawKillFeed(ctx) {                         //KILL FEED
-
-    ctx.save();
-
-    ctx.font = "18px Arial";
-    ctx.textAlign = "right";
-
-    let y = 40;
-
-    for (const kill of killFeed) {
-
-        let icon = "🔫";
-
-        if (kill.weapon === "grenade")
-            icon = "💣";
-
-        ctx.fillStyle = "white";
-
-        ctx.fillText(
-            `${kill.killer} ${icon} ${kill.victim}`,
-            ctx.canvas.width - 20,
-            y
-        );
-
-        y += 26;
-    }
-
-    ctx.restore();
-
-}*/
-
-function drawKillFeed(ctx) {
+function drawKillFeed(ctx) {                         //KILL FEED
 
     ctx.save();
 
@@ -618,6 +587,37 @@ function drawKillFeed(ctx) {
     }
 
     ctx.restore();
+}
+
+function drawHealthPacks(ctx) {                      //HEALTH PACKS
+
+    for (const hp of healthPacks) {
+
+        if (!hp.active)
+            continue;
+
+        // Green box
+        ctx.fillStyle = "#32CD32";
+        ctx.fillRect(hp.x, hp.y, 30, 30);
+
+        // White border
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(hp.x, hp.y, 30, 30);
+
+        // White +
+        ctx.fillStyle = "white";
+        ctx.font = "22px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        ctx.fillText(
+            "+",
+            hp.x + 15,
+            hp.y + 15
+        );
+    }
+
 }
 
 export function render(                                  //RENDER
@@ -653,6 +653,8 @@ export function render(                                  //RENDER
     );
 
     drawMap(ctx);
+
+    drawHealthPacks(ctx);
 
     drawPlayers(ctx);
 

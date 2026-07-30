@@ -20,12 +20,34 @@ const bullets = [];
 const soundEvents = [];
 const grenades = [];
 const killFeed = [];
+const healthPacks = [];
 
 const wss = new WebSocket.Server({
     port: 8080
 });
 
 console.log("Server running on port 8080");
+
+function spawnHealthPack(x, y) {
+
+    healthPacks.push({
+        id: Date.now() + Math.random(),
+
+        x: x,
+        y: y,
+
+        amount: 25,
+
+        active: true,
+
+        respawnTimer: 0
+    });
+
+}
+spawnHealthPack(200, 200);
+spawnHealthPack(700, 250);
+spawnHealthPack(400, 600);
+spawnHealthPack(900, 500);
 
 wss.on("connection", (ws) => {
 
@@ -673,6 +695,7 @@ setInterval(() => {
             players,
             bullets,
             grenades,
+            healthPacks,
             sounds: soundEvents,
             killFeed
 
