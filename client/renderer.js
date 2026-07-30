@@ -1,7 +1,7 @@
 import { players, bullets, grenades, killFeed, healthPacks, myId } from "./network.js";
 import { map, TILE_SIZE } from "./map.js";
 import { cameraX, cameraY, shakeX, shakeY } from "./camera.js";
-import { explosions } from "./effects.js";
+import { explosions, drawFloatingTexts } from "./effects.js";
 
 
 function drawMap(ctx) {                              //MAP
@@ -701,6 +701,8 @@ export function render(                                  //RENDER
     drawBullets(ctx);
 
     drawGrenades(ctx);
+
+    drawFloatingTexts(ctx);
 
     drawExplosions(ctx);
 

@@ -21,6 +21,7 @@ const soundEvents = [];
 const grenades = [];
 const killFeed = [];
 const healthPacks = [];
+const healEvents = [];
 
 const wss = new WebSocket.Server({
     port: 8080
@@ -52,6 +53,8 @@ spawnHealthPack(900, 500);
 wss.on("connection", (ws) => {
 
     const id = Date.now().toString();
+
+    ws.id = id;
 
     players[id] = {
 
@@ -482,8 +485,14 @@ setInterval(() => {        //main game loop
                     player.hp = Math.min(100, player.hp + hp.amount);
 
                     hp.active = false;
+                    hp.respawnTimer = 600;
 
-                    hp.respawnTimer = 600; // ~10 seconds at 60 FPS
+                    healEvents.push({
+                        player: id,
+                        x: player.x + 25,
+                        y: player.y
+                    });
+
                 }
             }
         }
@@ -746,32 +755,32 @@ setInterval(() => {        //main game loop
 // SEND GAME STATE
 setInterval(() => {
 
-    const state =
-        JSON.stringify({
+    wss.clients.forEach((client) => {
+
+        if (client.readyState !== WebSocket.OPEN)
+            return;
+
+        const state = JSON.stringify({
 
             players,
             bullets,
             grenades,
+            killFeed,
             healthPacks,
             sounds: soundEvents,
-            killFeed
+
+            healEvent:
+                healEvents.find(
+                    e => e.player === client.id
+                ) || null
 
         });
 
-    wss.clients.forEach(
-        (client) => {
+        client.send(state);
 
-            if (
-                client.readyState ===
-                WebSocket.OPEN
-            ) {
+    });
 
-                client.send(
-                    state
-                );
-            }
-        }
-    );
     soundEvents.length = 0;
+    healEvents.length = 0;
 
 }, 1000 / 60);
