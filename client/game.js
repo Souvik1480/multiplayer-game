@@ -4,7 +4,7 @@ import { map, TILE_SIZE } from "./map.js";
 import { render } from "./renderer.js";
 import { updateCamera, cameraX, cameraY, addCameraShake } from "./camera.js";
 import { playPistol, playRifle } from "./sound.js";
-import { updateEffects } from "./effects.js";
+import { updateEffects, updateFloatingTexts } from "./effects.js";
 
 let mouseX = 0;
 let mouseY = 0;
@@ -208,6 +208,8 @@ function sendInput() {
 function gameLoop() {
 
     update();
+
+    updateFloatingTexts();
 
     interpolate();
 

@@ -1,7 +1,7 @@
-import { players, bullets, grenades, killFeed, myId } from "./network.js";
+import { players, bullets, grenades, killFeed, healthPacks, myId } from "./network.js";
 import { map, TILE_SIZE } from "./map.js";
 import { cameraX, cameraY, shakeX, shakeY } from "./camera.js";
-import { explosions } from "./effects.js";
+import { explosions, drawFloatingTexts } from "./effects.js";
 
 
 function drawMap(ctx) {                              //MAP
@@ -556,38 +556,7 @@ function drawExplosions(ctx) {                       //EXPLOSION
 
 }
 
-/*function drawKillFeed(ctx) {                         //KILL FEED
-
-    ctx.save();
-
-    ctx.font = "18px Arial";
-    ctx.textAlign = "right";
-
-    let y = 40;
-
-    for (const kill of killFeed) {
-
-        let icon = "🔫";
-
-        if (kill.weapon === "grenade")
-            icon = "💣";
-
-        ctx.fillStyle = "white";
-
-        ctx.fillText(
-            `${kill.killer} ${icon} ${kill.victim}`,
-            ctx.canvas.width - 20,
-            y
-        );
-
-        y += 26;
-    }
-
-    ctx.restore();
-
-}*/
-
-function drawKillFeed(ctx) {
+function drawKillFeed(ctx) {                         //KILL FEED
 
     ctx.save();
 
@@ -618,6 +587,77 @@ function drawKillFeed(ctx) {
     }
 
     ctx.restore();
+}
+
+function drawHealthPacks(ctx) {                      //HEALTH PACKS
+
+    for (const hp of healthPacks) {
+
+        if (!hp.active)
+            continue;
+
+        const baseSize = 30;
+
+        const floatOffset = Math.sin(Date.now() / 300 + hp.id) * 4;
+
+        const pulse = 1 + Math.sin(Date.now() / 200 + hp.id) * 0.08;
+        const size = baseSize * pulse;
+
+        const x = hp.x - (size - baseSize) / 2;
+        const y = hp.y + floatOffset - (size - baseSize) / 2;
+
+        // -------------------------
+        // Glow
+        // -------------------------
+        ctx.beginPath();
+        ctx.fillStyle = "rgba(0,255,120,0.20)";
+        ctx.arc(
+            x + size / 2,
+            y + size / 2,
+            26,
+            0,
+            Math.PI * 2
+        );
+        ctx.fill();
+
+        // -------------------------
+        // Main box
+        // -------------------------
+        ctx.fillStyle = "#32CD32";
+
+        ctx.beginPath();
+        ctx.roundRect(
+            x,
+            y,
+            size,
+            size,
+            6
+        );
+        ctx.fill();
+
+        // -------------------------
+        // Border
+        // -------------------------
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "white";
+        ctx.stroke();
+
+        // -------------------------
+        // Heart
+        // -------------------------
+        ctx.font = "18px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        ctx.fillStyle = "white";
+
+        ctx.fillText(
+            "❤",
+            x + size / 2,
+            y + size / 2 + 1
+        );
+    }
+
 }
 
 export function render(                                  //RENDER
@@ -654,11 +694,15 @@ export function render(                                  //RENDER
 
     drawMap(ctx);
 
+    drawHealthPacks(ctx);
+
     drawPlayers(ctx);
 
     drawBullets(ctx);
 
     drawGrenades(ctx);
+
+    drawFloatingTexts(ctx);
 
     drawExplosions(ctx);
 

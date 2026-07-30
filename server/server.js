@@ -20,6 +20,8 @@ const bullets = [];
 const soundEvents = [];
 const grenades = [];
 const killFeed = [];
+const healthPacks = [];
+const healEvents = [];
 
 const wss = new WebSocket.Server({
     port: 8080
@@ -27,9 +29,32 @@ const wss = new WebSocket.Server({
 
 console.log("Server running on port 8080");
 
+function spawnHealthPack(x, y) {
+
+    healthPacks.push({
+        id: Date.now() + Math.random(),
+
+        x: x,
+        y: y,
+
+        amount: 25,
+
+        active: true,
+
+        respawnTimer: 0
+    });
+
+}
+spawnHealthPack(200, 200);
+spawnHealthPack(700, 250);
+spawnHealthPack(400, 600);
+spawnHealthPack(900, 500);
+
 wss.on("connection", (ws) => {
 
     const id = Date.now().toString();
+
+    ws.id = id;
 
     players[id] = {
 
@@ -395,6 +420,7 @@ setInterval(() => {        //main game loop
 
         }
 
+        //Grenades
         if (p.grenade) {
 
             const dx = p.mouseX - (p.x + 25);
@@ -424,7 +450,51 @@ setInterval(() => {        //main game loop
 
             // Prevent creating 60 grenades while G is held
             p.grenade = false;
+        }
 
+        //Pickup detection
+        for (const id in players) {
+
+            const player = players[id];
+
+            if (!player.alive)
+                continue;
+
+            for (const hp of healthPacks) {
+
+                if (!hp.active)
+                    continue;
+
+                // Don't consume a health pack if already full HP
+                if (player.hp >= 100)
+                    continue;
+
+                const playerCenterX = player.x + 25;
+                const playerCenterY = player.y + 25;
+
+                const healthCenterX = hp.x + 15;
+                const healthCenterY = hp.y + 15;
+
+                const dx = playerCenterX - healthCenterX;
+                const dy = playerCenterY - healthCenterY;
+
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < 30) {
+
+                    player.hp = Math.min(100, player.hp + hp.amount);
+
+                    hp.active = false;
+                    hp.respawnTimer = 600;
+
+                    healEvents.push({
+                        player: id,
+                        x: player.x + 25,
+                        y: player.y
+                    });
+
+                }
+            }
         }
 
 
@@ -649,6 +719,24 @@ setInterval(() => {        //main game loop
 
     }
 
+    // HEALTH PACK RESPAWN
+    for (const hp of healthPacks) {
+
+        if (hp.active)
+            continue;
+
+        hp.respawnTimer--;
+
+        if (hp.respawnTimer <= 0) {
+
+            hp.active = true;
+
+            hp.respawnTimer = 0;
+
+        }
+
+    }
+
     //KILL FEED TIMER
     for (let i = killFeed.length - 1; i >= 0; i--) {
 
@@ -667,31 +755,32 @@ setInterval(() => {        //main game loop
 // SEND GAME STATE
 setInterval(() => {
 
-    const state =
-        JSON.stringify({
+    wss.clients.forEach((client) => {
+
+        if (client.readyState !== WebSocket.OPEN)
+            return;
+
+        const state = JSON.stringify({
 
             players,
             bullets,
             grenades,
+            killFeed,
+            healthPacks,
             sounds: soundEvents,
-            killFeed
+
+            healEvent:
+                healEvents.find(
+                    e => e.player === client.id
+                ) || null
 
         });
 
-    wss.clients.forEach(
-        (client) => {
+        client.send(state);
 
-            if (
-                client.readyState ===
-                WebSocket.OPEN
-            ) {
+    });
 
-                client.send(
-                    state
-                );
-            }
-        }
-    );
     soundEvents.length = 0;
+    healEvents.length = 0;
 
 }, 1000 / 60);
