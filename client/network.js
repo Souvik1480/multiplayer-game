@@ -64,6 +64,25 @@ socket.onmessage = (event) => {
         );
     }
 
+    for (const impact of data.impactEvents || []) {
+
+        createBurst(
+
+            impact.x,
+            impact.y,
+
+            impact.type === "player"
+                ? "#ff3333"
+                : "#FFD700",
+
+            impact.type === "player"
+                ? 12
+                : 8
+
+        );
+
+    }
+
     for (const sound of data.sounds || []) {
 
         switch (sound.type) {
@@ -131,6 +150,13 @@ socket.onmessage = (event) => {
                 createExplosion(
                     sound.x,
                     sound.y
+                );
+
+                createBurst(
+                    sound.x,
+                    sound.y,
+                    "#ff8800",
+                    80
                 );
 
                 const me = players[myId];

@@ -22,6 +22,7 @@ const grenades = [];
 const killFeed = [];
 const healthPacks = [];
 const healEvents = [];
+const impactEvents = [];
 
 const wss = new WebSocket.Server({
     port: 8080
@@ -520,23 +521,31 @@ setInterval(() => {        //main game loop
 
         if (isWall(b.x, b.y)) {
 
+            impactEvents.push({
+
+                x: b.x,
+                y: b.y,
+
+                type: "wall"
+
+            });
+
             bullets.splice(i, 1);
 
             continue;
 
         }
 
-        if (
+        if (bulletHitWall(b.x, b.y)) {
 
-            bulletHitWall(
+            impactEvents.push({
 
-                b.x,
+                x: b.x,
+                y: b.y,
 
-                b.y
+                type: "wall"
 
-            )
-
-        ) {
+            });
 
             bullets.splice(i, 1);
 
@@ -612,6 +621,15 @@ setInterval(() => {        //main game loop
                 }
 
                 hit = true;
+
+                impactEvents.push({
+
+                    x: b.x,
+                    y: b.y,
+
+                    type: "player"
+
+                });
 
                 const shooter = players[b.owner];
 
@@ -769,6 +787,8 @@ setInterval(() => {
             healthPacks,
             sounds: soundEvents,
 
+            impactEvents,
+
             healEvent:
                 healEvents.find(
                     e => e.player === client.id
@@ -782,5 +802,6 @@ setInterval(() => {
 
     soundEvents.length = 0;
     healEvents.length = 0;
+    impactEvents.length = 0;
 
 }, 1000 / 60);
