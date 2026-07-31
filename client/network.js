@@ -1,5 +1,5 @@
 import { playPistol, playRifle, playReload, playEmpty, playExplosion } from "./sound.js";
-import { createExplosion, createFloatingText } from "./effects.js";
+import { createExplosion, createFloatingText, createBurst } from "./effects.js";
 import { addCameraShake } from "./camera.js";
 const socket = new WebSocket(
     "ws://127.0.0.1:8080"
@@ -47,13 +47,20 @@ socket.onmessage = (event) => {
 
     }
 
-    if(data.healEvent) {
+    if (data.healEvent) {
 
         createFloatingText(
             data.healEvent.x,
             data.healEvent.y,
-            "+25",
-            "#00ff66"
+            data.healEvent.text,
+            data.healEvent.color
+        );
+
+        createBurst(
+            data.healEvent.x,
+            data.healEvent.y,
+            "#00ff66",
+            30
         );
     }
 

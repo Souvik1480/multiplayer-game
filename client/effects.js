@@ -2,6 +2,7 @@
 
 export const explosions = [];
 export const floatingTexts = [];
+export const particles = [];
 
 // Create a new explosion
 export function createExplosion(x, y) {
@@ -84,6 +85,132 @@ export function drawFloatingTexts(ctx) {
             t.x,
             t.y
         );
+
+    }
+
+    ctx.globalAlpha = 1;
+
+}
+
+export function createParticle(
+    x,
+    y,
+    vx,
+    vy,
+    size,
+    color,
+    life
+) {
+
+    particles.push({
+
+        x,
+        y,
+
+        vx,
+        vy,
+
+        size,
+
+        color,
+
+        life,
+        maxLife: life
+
+    });
+
+}
+
+export function createBurst(
+    x,
+    y,
+    color,
+    count
+) {
+
+    for (let i = 0; i < count; i++) {
+
+        const angle = Math.random() * Math.PI * 2;
+
+        const speed = 1 + Math.random() * 3;
+
+        createParticle(
+
+            x,
+            y,
+
+            Math.cos(angle) * speed,
+
+            Math.sin(angle) * speed,
+
+            3 + Math.random() * 4,
+
+            color,
+
+            40 + Math.random() * 20
+
+        );
+
+    }
+
+}
+
+export function updateParticles() {
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+
+        const p = particles[i];
+
+        // Move
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Slow down slightly
+        p.vx *= 0.97;
+        p.vy *= 0.97;
+
+        // Shrink
+        p.size *= 0.98;
+
+        // Lifetime
+        p.life--;
+
+        // Remove dead particles
+        if (p.life <= 0 || p.size < 0.5) {
+
+            particles.splice(i, 1);
+
+        }
+
+    }
+
+}
+
+export function drawParticles(ctx) {
+
+    for (const p of particles) {
+
+        ctx.globalAlpha = p.life / p.maxLife;
+
+        ctx.beginPath();
+
+        ctx.arc(
+
+            p.x,
+
+            p.y,
+
+            p.size,
+
+            0,
+
+            Math.PI * 2
+
+        );
+
+        ctx.fillStyle = p.color;
+
+        ctx.fill();
 
     }
 
