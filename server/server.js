@@ -23,6 +23,7 @@ const killFeed = [];
 const healthPacks = [];
 const healEvents = [];
 const impactEvents = [];
+const deathEvents = [];
 
 const wss = new WebSocket.Server({
     port: 8080
@@ -147,15 +148,6 @@ wss.on("connection", (ws) => {
 
             p.weapon = input.weapon;
 
-            console.log(
-
-                p.name,
-
-                "SWITCHED TO",
-
-                p.weapon
-
-            );
 
         }
 
@@ -502,7 +494,6 @@ setInterval(() => {        //main game loop
     }
 
 
-
     // BULLET UPDATE
     for (
         let i =
@@ -603,6 +594,13 @@ setInterval(() => {        //main game loop
 
                     p.alive = false;
 
+                    deathEvents.push({
+
+                        x: p.x + 25,
+                        y: p.y + 25
+
+                    });
+
                     p.deaths++;
 
                     p.respawnTimer = 300;
@@ -699,6 +697,20 @@ setInterval(() => {        //main game loop
                     if (p.hp <= 0 && p.alive) {
 
                         p.alive = false;
+                        console.log(
+                            "DEATH:",
+                            p.name,
+                            "at",
+                            p.x,
+                            p.y
+                        );
+
+                        deathEvents.push({
+
+                            x: p.x + 25,
+                            y: p.y + 25
+
+                        });
 
                         p.deaths++;
 
@@ -785,9 +797,10 @@ setInterval(() => {
             grenades,
             killFeed,
             healthPacks,
-            sounds: soundEvents,
 
+            sounds: soundEvents,
             impactEvents,
+            deathEvents,
 
             healEvent:
                 healEvents.find(
@@ -803,5 +816,6 @@ setInterval(() => {
     soundEvents.length = 0;
     healEvents.length = 0;
     impactEvents.length = 0;
+    deathEvents.length = 0;
 
 }, 1000 / 60);

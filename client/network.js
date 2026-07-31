@@ -83,6 +83,21 @@ socket.onmessage = (event) => {
 
     }
 
+    if (data.deathEvents && data.deathEvents.length > 0) {
+
+        for (const death of data.deathEvents) {
+
+            createBurst(
+                death.x,
+                death.y,
+                "#00FFFF",   
+                250          
+            );
+
+        }
+
+    }
+
     for (const sound of data.sounds || []) {
 
         switch (sound.type) {
