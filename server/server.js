@@ -24,6 +24,7 @@ const healthPacks = [];
 const healEvents = [];
 const impactEvents = [];
 const deathEvents = [];
+const damageEvents = [];
 
 
 const wss = new WebSocket.Server({
@@ -589,6 +590,18 @@ setInterval(() => {        //main game loop
                     p.hp - b.damage
                 );
 
+                damageEvents.push({
+
+                    player: id,
+
+                    x: p.x + 25,
+
+                    y: p.y,
+
+                    damage: b.damage
+
+                });
+
                 // Check if the player just died
                 if (p.hp <= 0 && p.alive) {
 
@@ -765,17 +778,20 @@ setInterval(() => {        //main game loop
                         p.hp - damage
                     );
 
+                    damageEvents.push({
+
+                        player: id,
+
+                        x: p.x + 25,
+
+                        y: p.y,
+
+                        damage: damage
+
+                    });
+
                     //Player died?
                     if (p.hp <= 0 && p.alive) {
-
-                        p.alive = false;
-                        console.log(
-                            "DEATH:",
-                            p.name,
-                            "at",
-                            p.x,
-                            p.y
-                        );
 
                         deathEvents.push({
 
@@ -873,6 +889,7 @@ setInterval(() => {
             sounds: soundEvents,
             impactEvents,
             deathEvents,
+            damageEvents,
 
             healEvent:
                 healEvents.find(
@@ -889,5 +906,6 @@ setInterval(() => {
     healEvents.length = 0;
     impactEvents.length = 0;
     deathEvents.length = 0;
+    damageEvents.length = 0;
 
 }, 1000 / 60);

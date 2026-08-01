@@ -63,8 +63,9 @@ export function playExplosion(volume = 1) {
 
     s.volume = explosion.volume * volume;
 
-    s.play().catch(err => console.error(err));
-
+    s.play().catch(() => {
+        // Ignore autoplay restriction
+    });
 }
 
 export function playGrenadeBounce(volume = 1) {
@@ -73,6 +74,8 @@ export function playGrenadeBounce(volume = 1) {
 
     s.volume = grenadeBounce.volume * volume;
 
-    s.play().catch(err => console.error(err));
+    s.play().catch(() => {
+        // Ignore autoplay restriction
+    });
 
 }

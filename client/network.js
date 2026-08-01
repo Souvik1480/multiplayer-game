@@ -98,6 +98,26 @@ socket.onmessage = (event) => {
 
     }
 
+    for (const damage of data.damageEvents || []) {
+
+        const p = players[damage.player];
+
+        if (!p) continue;
+
+        createFloatingText(
+
+            p.x + 25,
+
+            p.y,
+
+            "-" + damage.damage,
+
+            "#ff3333"
+
+        );
+
+    }
+
     for (const sound of data.sounds || []) {
 
         switch (sound.type) {
