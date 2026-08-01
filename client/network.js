@@ -1,5 +1,5 @@
-import { playPistol, playRifle, playReload, playEmpty, playExplosion } from "./sound.js";
-import { createExplosion, createFloatingText, createBurst } from "./effects.js";
+import { playPistol, playRifle, playReload, playEmpty, playExplosion, playGrenadeBounce } from "./sound.js";
+import { createExplosion, createFloatingText, createBurst, createParticle } from "./effects.js";
 import { addCameraShake } from "./camera.js";
 const socket = new WebSocket(
     "ws://127.0.0.1:8080"
@@ -90,8 +90,8 @@ socket.onmessage = (event) => {
             createBurst(
                 death.x,
                 death.y,
-                "#00FFFF",   
-                250          
+                "#00FFFF",
+                250
             );
 
         }
@@ -159,6 +159,57 @@ socket.onmessage = (event) => {
                 }
 
                 break;
+
+            case "grenadeBounce": {
+
+                const me = players[myId];
+
+                if (!me) break;
+
+                const dx = me.x + 25 - sound.x;
+                const dy = me.y + 25 - sound.y;
+
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                const MAX_DISTANCE = 1000;
+
+                const volume = Math.max(
+                    0,
+                    1 - distance / MAX_DISTANCE
+                );
+
+                if (volume > 0) {
+
+                    playGrenadeBounce(volume);
+
+                }
+
+                break;
+            }
+
+            case "grenadeTrail": {
+
+                createParticle(
+
+                    sound.x,
+
+                    sound.y,
+
+                    (Math.random() - 0.5) * 0.3,
+
+                    (Math.random() - 0.5) * 0.3,
+
+                    5,
+
+                    "#888888",
+
+                    25
+
+                );
+
+                break;
+
+            }
 
             case "explosion": {
 

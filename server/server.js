@@ -25,6 +25,7 @@ const healEvents = [];
 const impactEvents = [];
 const deathEvents = [];
 
+
 const wss = new WebSocket.Server({
     port: 8080
 });
@@ -656,12 +657,83 @@ setInterval(() => {        //main game loop
         const g = grenades[i];
 
         // Move
-        g.x += g.vx;
-        g.y += g.vy;
+        const nextX = g.x + g.vx;
+        const nextY = g.y + g.vy;
+
+        //grenade trail
+        g.trailTimer ??= 0;
+
+        g.trailTimer++;
+
+        if (g.trailTimer >= 3) {
+
+            g.trailTimer = 0;
+
+            soundEvents.push({
+
+                type: "grenadeTrail",
+
+                x: g.x,
+
+                y: g.y
+
+            });
+
+        }
+
+        //x collision
+        if (isWall(nextX, g.y)) {
+
+            if (Math.abs(g.vx) > 1) {
+
+                soundEvents.push({
+                    type: "grenadeBounce",
+                    x: g.x,
+                    y: g.y
+                });
+
+            }
+
+            g.vx *= -0.7;
+
+
+        } else {
+
+            g.x = nextX;
+
+        }
+
+        //y collision
+        if (isWall(g.x, nextY)) {
+
+            if (Math.abs(g.vy) > 1) {
+
+                soundEvents.push({
+                    type: "grenadeBounce",
+                    x: g.x,
+                    y: g.y
+                });
+
+            }
+
+            g.vy *= -0.7;
+
+
+        } else {
+
+            g.y = nextY;
+
+        }
 
         // Friction
         g.vx *= 0.98;
         g.vy *= 0.98;
+
+        if (Math.abs(g.vx) < 0.15)
+            g.vx = 0;
+
+        if (Math.abs(g.vy) < 0.15)
+            g.vy = 0;
 
         g.timer--;
 

@@ -3,6 +3,7 @@ const rifle = new Audio("audio/rifle.mp3");
 const reload = new Audio("audio/reload.mp3");
 const empty = new Audio("audio/empty.mp3");
 const explosion = new Audio("audio/explosion.mp3");
+const grenadeBounce = new Audio("audio/grenadeBounce.mp3");
 
 // Volume
 pistol.volume = 0.35;
@@ -10,6 +11,7 @@ rifle.volume = 0.30;
 reload.volume = 0.45;
 empty.volume = 0.40;
 explosion.volume = 0.45;
+grenadeBounce.volume = 0.25;
 
 // ----------
 // FUNCTIONS
@@ -60,6 +62,16 @@ export function playExplosion(volume = 1) {
     const s = explosion.cloneNode();
 
     s.volume = explosion.volume * volume;
+
+    s.play().catch(err => console.error(err));
+
+}
+
+export function playGrenadeBounce(volume = 1) {
+
+    const s = grenadeBounce.cloneNode();
+
+    s.volume = grenadeBounce.volume * volume;
 
     s.play().catch(err => console.error(err));
 
