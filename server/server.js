@@ -22,6 +22,9 @@ const grenades = [];
 const killFeed = [];
 const healthPacks = [];
 const healEvents = [];
+const impactEvents = [];
+const deathEvents = [];
+
 
 const wss = new WebSocket.Server({
     port: 8080
@@ -146,15 +149,6 @@ wss.on("connection", (ws) => {
 
             p.weapon = input.weapon;
 
-            console.log(
-
-                p.name,
-
-                "SWITCHED TO",
-
-                p.weapon
-
-            );
 
         }
 
@@ -501,7 +495,6 @@ setInterval(() => {        //main game loop
     }
 
 
-
     // BULLET UPDATE
     for (
         let i =
@@ -520,23 +513,31 @@ setInterval(() => {        //main game loop
 
         if (isWall(b.x, b.y)) {
 
+            impactEvents.push({
+
+                x: b.x,
+                y: b.y,
+
+                type: "wall"
+
+            });
+
             bullets.splice(i, 1);
 
             continue;
 
         }
 
-        if (
+        if (bulletHitWall(b.x, b.y)) {
 
-            bulletHitWall(
+            impactEvents.push({
 
-                b.x,
+                x: b.x,
+                y: b.y,
 
-                b.y
+                type: "wall"
 
-            )
-
-        ) {
+            });
 
             bullets.splice(i, 1);
 
@@ -594,6 +595,13 @@ setInterval(() => {        //main game loop
 
                     p.alive = false;
 
+                    deathEvents.push({
+
+                        x: p.x + 25,
+                        y: p.y + 25
+
+                    });
+
                     p.deaths++;
 
                     p.respawnTimer = 300;
@@ -612,6 +620,15 @@ setInterval(() => {        //main game loop
                 }
 
                 hit = true;
+
+                impactEvents.push({
+
+                    x: b.x,
+                    y: b.y,
+
+                    type: "player"
+
+                });
 
                 const shooter = players[b.owner];
 
@@ -640,12 +657,83 @@ setInterval(() => {        //main game loop
         const g = grenades[i];
 
         // Move
-        g.x += g.vx;
-        g.y += g.vy;
+        const nextX = g.x + g.vx;
+        const nextY = g.y + g.vy;
+
+        //grenade trail
+        g.trailTimer ??= 0;
+
+        g.trailTimer++;
+
+        if (g.trailTimer >= 3) {
+
+            g.trailTimer = 0;
+
+            soundEvents.push({
+
+                type: "grenadeTrail",
+
+                x: g.x,
+
+                y: g.y
+
+            });
+
+        }
+
+        //x collision
+        if (isWall(nextX, g.y)) {
+
+            if (Math.abs(g.vx) > 1) {
+
+                soundEvents.push({
+                    type: "grenadeBounce",
+                    x: g.x,
+                    y: g.y
+                });
+
+            }
+
+            g.vx *= -0.7;
+
+
+        } else {
+
+            g.x = nextX;
+
+        }
+
+        //y collision
+        if (isWall(g.x, nextY)) {
+
+            if (Math.abs(g.vy) > 1) {
+
+                soundEvents.push({
+                    type: "grenadeBounce",
+                    x: g.x,
+                    y: g.y
+                });
+
+            }
+
+            g.vy *= -0.7;
+
+
+        } else {
+
+            g.y = nextY;
+
+        }
 
         // Friction
         g.vx *= 0.98;
         g.vy *= 0.98;
+
+        if (Math.abs(g.vx) < 0.15)
+            g.vx = 0;
+
+        if (Math.abs(g.vy) < 0.15)
+            g.vy = 0;
 
         g.timer--;
 
@@ -681,6 +769,20 @@ setInterval(() => {        //main game loop
                     if (p.hp <= 0 && p.alive) {
 
                         p.alive = false;
+                        console.log(
+                            "DEATH:",
+                            p.name,
+                            "at",
+                            p.x,
+                            p.y
+                        );
+
+                        deathEvents.push({
+
+                            x: p.x + 25,
+                            y: p.y + 25
+
+                        });
 
                         p.deaths++;
 
@@ -767,7 +869,10 @@ setInterval(() => {
             grenades,
             killFeed,
             healthPacks,
+
             sounds: soundEvents,
+            impactEvents,
+            deathEvents,
 
             healEvent:
                 healEvents.find(
@@ -782,5 +887,7 @@ setInterval(() => {
 
     soundEvents.length = 0;
     healEvents.length = 0;
+    impactEvents.length = 0;
+    deathEvents.length = 0;
 
 }, 1000 / 60);

@@ -76,7 +76,7 @@ function fireWeapon(player, bullets, ownerId, soundEvents) {
 
         owner: ownerId,
 
-        weapon: player.damage,
+        weapon: player.weapon,
 
         damage: weapon.damage,
 

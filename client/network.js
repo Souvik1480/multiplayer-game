@@ -1,5 +1,5 @@
-import { playPistol, playRifle, playReload, playEmpty, playExplosion } from "./sound.js";
-import { createExplosion, createFloatingText } from "./effects.js";
+import { playPistol, playRifle, playReload, playEmpty, playExplosion, playGrenadeBounce } from "./sound.js";
+import { createExplosion, createFloatingText, createBurst, createParticle } from "./effects.js";
 import { addCameraShake } from "./camera.js";
 const socket = new WebSocket(
     "ws://127.0.0.1:8080"
@@ -47,14 +47,55 @@ socket.onmessage = (event) => {
 
     }
 
-    if(data.healEvent) {
+    if (data.healEvent) {
 
         createFloatingText(
             data.healEvent.x,
             data.healEvent.y,
-            "+25",
-            "#00ff66"
+            data.healEvent.text,
+            data.healEvent.color
         );
+
+        createBurst(
+            data.healEvent.x,
+            data.healEvent.y,
+            "#00ff66",
+            30
+        );
+    }
+
+    for (const impact of data.impactEvents || []) {
+
+        createBurst(
+
+            impact.x,
+            impact.y,
+
+            impact.type === "player"
+                ? "#ff3333"
+                : "#FFD700",
+
+            impact.type === "player"
+                ? 12
+                : 8
+
+        );
+
+    }
+
+    if (data.deathEvents && data.deathEvents.length > 0) {
+
+        for (const death of data.deathEvents) {
+
+            createBurst(
+                death.x,
+                death.y,
+                "#00FFFF",
+                250
+            );
+
+        }
+
     }
 
     for (const sound of data.sounds || []) {
@@ -119,11 +160,69 @@ socket.onmessage = (event) => {
 
                 break;
 
+            case "grenadeBounce": {
+
+                const me = players[myId];
+
+                if (!me) break;
+
+                const dx = me.x + 25 - sound.x;
+                const dy = me.y + 25 - sound.y;
+
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                const MAX_DISTANCE = 1000;
+
+                const volume = Math.max(
+                    0,
+                    1 - distance / MAX_DISTANCE
+                );
+
+                if (volume > 0) {
+
+                    playGrenadeBounce(volume);
+
+                }
+
+                break;
+            }
+
+            case "grenadeTrail": {
+
+                createParticle(
+
+                    sound.x,
+
+                    sound.y,
+
+                    (Math.random() - 0.5) * 0.3,
+
+                    (Math.random() - 0.5) * 0.3,
+
+                    5,
+
+                    "#888888",
+
+                    25
+
+                );
+
+                break;
+
+            }
+
             case "explosion": {
 
                 createExplosion(
                     sound.x,
                     sound.y
+                );
+
+                createBurst(
+                    sound.x,
+                    sound.y,
+                    "#ff8800",
+                    80
                 );
 
                 const me = players[myId];
