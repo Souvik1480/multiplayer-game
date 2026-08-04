@@ -15,6 +15,10 @@ const {
 
 const WebSocket = require("ws");
 
+const { updateBots } = require("./ai");
+
+const { isWall, bulletHitWall } = require("./collision");
+
 const players = {};
 const bullets = [];
 const soundEvents = [];
@@ -24,6 +28,56 @@ const healthPacks = [];
 const healEvents = [];
 const impactEvents = [];
 const deathEvents = [];
+
+players["bot1"] = {
+
+    name: "Bot",
+
+    weapon: "pistol",
+
+    ammo: {
+        pistol: 12,
+        rifle: 30
+    },
+
+    reloading: false,
+
+    lastShot: 0,
+
+    kills: 0,
+    deaths: 0,
+
+    respawnTimer: 0,
+
+    flash: 0,
+
+    hitMarker: 0,
+
+    hp: 100,
+    alive: true,
+
+    x: 600,
+    y: 300,
+
+    angle: 0,
+
+    mouseX: 600,
+    mouseY: 300,
+
+    shoot: false,
+
+    up: false,
+    down: false,
+    left: false,
+    right: false,
+
+    bot: true,
+
+    avoidTimer: 0,
+
+    avoidDirection: 0
+
+};
 
 
 const wss = new WebSocket.Server({
@@ -168,30 +222,9 @@ wss.on("connection", (ws) => {
     });
 });
 
-function isWall(x, y) {
-
-    const col = Math.floor(x / TILE_SIZE);
-    const row = Math.floor(y / TILE_SIZE);
-
-    if (
-        row < 0 ||
-        row >= MAP.length ||
-        col < 0 ||
-        col >= MAP[0].length
-    ) {
-        return true;
-    }
-
-    return MAP[row][col] === "#";
-}
-
-function bulletHitWall(x, y) {
-
-    return isWall(x, y);
-
-}
-
 setInterval(() => {        //main game loop
+
+    updateBots(players);
 
     // PLAYER UPDATE
     for (const id in players) {
