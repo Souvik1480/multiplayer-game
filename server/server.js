@@ -402,6 +402,10 @@ setInterval(() => {        //main game loop
 
         ) {
 
+            console.log(
+                p.bot ? "🤖 BOT FIRED!" : "👤 PLAYER FIRED!"
+            );
+
             fireWeapon(
 
                 p,

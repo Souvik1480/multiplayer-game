@@ -50,27 +50,37 @@ function fireWeapon(player, bullets, ownerId, soundEvents) {
     const centerX = player.x + 25;
     const centerY = player.y + 25;
 
-    const dx = player.mouseX - centerX;
-    const dy = player.mouseY - centerY;
-
     const spread =
-
         (Math.random() - 0.5) *
-
         weapon.spread;
 
-    const len = Math.sqrt(dx * dx + dy * dy);
+    let angle;
 
-    if (len === 0)
-        return;
+    // BOT AIM
+    if (player.bot) {
 
-    const angle =
+        angle = player.angle + spread;
 
-        Math.atan2(dy, dx) +
+    }
 
-        spread;
+    // HUMAN AIM
+    else {
 
-    player.angle = angle;
+        const dx = player.mouseX - centerX;
+        const dy = player.mouseY - centerY;
+
+        const len = Math.sqrt(dx * dx + dy * dy);
+
+        if (len === 0)
+            return;
+
+        angle =
+            Math.atan2(dy, dx) +
+            spread;
+
+        player.angle = angle;
+
+    }
 
     bullets.push({
 
@@ -119,15 +129,15 @@ function fireWeapon(player, bullets, ownerId, soundEvents) {
 
         player: ownerId
 
-    });    
+    });
     console.log("GUN SOUND EVENT:", player.weapon);
 
 }
 
 module.exports = {
 
-            WEAPONS,
+    WEAPONS,
 
-            fireWeapon
+    fireWeapon
 
-        };
+};

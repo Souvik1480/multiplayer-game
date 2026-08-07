@@ -113,7 +113,7 @@ function updateBots(players) {
 
             }
 
-            if (distance < ATTACK_RANGE) {
+            if (distance > ATTACK_RANGE) {
 
                 const moveX = (dx / distance) * BOT_SPEED;
                 const moveY = (dy / distance) * BOT_SPEED;
@@ -123,8 +123,19 @@ function updateBots(players) {
                 if (hitWall) {
 
                     bot.avoidTimer = 30;
-
                     bot.avoidDirection = Math.random() * Math.PI * 2;
+
+                }
+
+            } else {
+
+                if (bot.ammo[bot.weapon] > 0) {
+
+                    bot.shoot = true;
+
+                } else {
+
+                    bot.reload = true;
 
                 }
 
