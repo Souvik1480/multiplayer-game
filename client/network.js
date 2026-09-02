@@ -5,12 +5,30 @@ const socket = new WebSocket(
     "ws://127.0.0.1:8080"
 );
 
+export function selectGameMode(mode) {
+
+    gameMode = mode;
+
+    if (socket.readyState === WebSocket.OPEN) {
+
+        socket.send(JSON.stringify({
+            type: "gameMode",
+            mode: mode
+        }));
+
+        console.log("🎮 GAME MODE:", mode);
+
+    }
+
+}
+
 export let players = {};
 export let bullets = [];
 export let myId = "";
 export let grenades = [];
 export let killFeed = [];
 export let healthPacks = [];
+export let gameMode = "";
 
 socket.onopen = () => {
 

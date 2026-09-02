@@ -1,5 +1,5 @@
 import { keys } from "./input.js";
-import socket, { players, bullets, myId } from "./network.js";
+import socket, { players, bullets, myId, selectGameMode } from "./network.js";
 import { map, TILE_SIZE } from "./map.js";
 import { render } from "./renderer.js";
 import { updateCamera, cameraX, cameraY, addCameraShake } from "./camera.js";
@@ -13,20 +13,25 @@ let currentWeapon = "pistol";
 let shooting = false;
 let lastRifleSound = 0;
 let grenadeRequest = false;
+let gameStarted = false;
 
 window.addEventListener(
-    "mousemove",
-    (e) => {
+    "mouseup",
+    () => {
 
-        mouseX = e.clientX;
-        mouseY = e.clientY;
+        if (!gameStarted) return;
+
+        shooting = false;
+
     }
-)
+);
 
 
 window.addEventListener(
     "mousedown",
     () => {
+
+        if (!gameStarted) return;
 
         shooting = true;
         shootRequest++;
@@ -37,11 +42,13 @@ window.addEventListener(
 );
 
 window.addEventListener(
-    "mouseup",
-    () => {
+    "mousemove",
+    (e) => {
 
-        shooting = false;
+        if (!gameStarted) return;
 
+        mouseX = e.clientX;
+        mouseY = e.clientY;
     }
 );
 
@@ -235,3 +242,31 @@ function gameLoop() {
 }
 
 gameLoop();
+
+const mainMenu = document.getElementById("mainMenu");
+const singlePlayerBtn = document.getElementById("singlePlayerBtn");
+const multiplayerBtn = document.getElementById("multiplayerBtn");
+
+singlePlayerBtn.addEventListener("click", () => {
+
+    selectGameMode("singleplayer");
+
+    gameStarted = true;
+
+    mainMenu.style.display = "none";
+
+    console.log("🎮 SINGLE PLAYER STARTED");
+
+});
+
+multiplayerBtn.addEventListener("click", () => {
+
+    selectGameMode("multiplayer");
+
+    gameStarted = true;
+
+    mainMenu.style.display = "none";
+
+    console.log("🌐 MULTIPLAYER STARTED");
+
+});

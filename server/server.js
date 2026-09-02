@@ -19,6 +19,8 @@ const { updateBots } = require("./ai");
 
 const { isWall, bulletHitWall } = require("./collision");
 
+const GAME_MODE = "singleplayer";
+
 const players = {};
 const bullets = [];
 const soundEvents = [];
@@ -28,57 +30,6 @@ const healthPacks = [];
 const healEvents = [];
 const impactEvents = [];
 const deathEvents = [];
-
-players["bot1"] = {
-
-    name: "Bot",
-
-    weapon: "pistol",
-
-    ammo: {
-        pistol: 12,
-        rifle: 30
-    },
-
-    reloading: false,
-
-    lastShot: 0,
-
-    kills: 0,
-    deaths: 0,
-
-    respawnTimer: 0,
-
-    flash: 0,
-
-    hitMarker: 0,
-
-    hp: 100,
-    alive: true,
-
-    x: 600,
-    y: 300,
-
-    angle: 0,
-
-    mouseX: 600,
-    mouseY: 300,
-
-    shoot: false,
-
-    up: false,
-    down: false,
-    left: false,
-    right: false,
-
-    bot: true,
-
-    avoidTimer: 0,
-
-    avoidDirection: 0
-
-};
-
 
 const wss = new WebSocket.Server({
     port: 8080
@@ -176,6 +127,90 @@ wss.on("connection", (ws) => {
             message.toString()
         );
 
+
+        // GAME MODE
+        if (input.type === "gameMode") {
+
+            console.log(
+                "🎮 GAME MODE SELECTED:",
+                input.mode
+            );
+
+
+            if (input.mode === "singleplayer") {
+
+                console.log(
+                    "🎮 SINGLE PLAYER MODE"
+                );
+
+
+                players["bot1"] = {
+
+                    name: "Bot",
+
+                    weapon: "pistol",
+
+                    ammo: {
+                        pistol: 12,
+                        rifle: 30
+                    },
+
+                    reloading: false,
+
+                    lastShot: 0,
+
+                    kills: 0,
+                    deaths: 0,
+
+                    respawnTimer: 0,
+
+                    flash: 0,
+
+                    hitMarker: 0,
+
+                    hp: 100,
+                    alive: true,
+
+                    x: 600,
+                    y: 300,
+
+                    angle: 0,
+
+                    mouseX: 600,
+                    mouseY: 300,
+
+                    shoot: false,
+
+                    up: false,
+                    down: false,
+                    left: false,
+                    right: false,
+
+                    bot: true,
+
+                    avoidTimer: 0,
+
+                    avoidDirection: 0
+
+                };
+
+            }
+
+
+            if (input.mode === "multiplayer") {
+
+                console.log(
+                    "🌐 MULTIPLAYER MODE"
+                );
+
+            }
+
+
+            return;
+        }
+
+
+        // NORMAL PLAYER INPUT
         const p = players[id];
 
         if (!p) return;
@@ -189,26 +224,24 @@ wss.on("connection", (ws) => {
         p.mouseY = input.mouseY;
 
         p.reload = input.reload;
+
         if (input.grenade && !p.grenade) {
             p.grenade = true;
         }
 
         if (
-
             input.weapon &&
-
             input.weapon !== p.weapon
-
         ) {
 
             p.weapon = input.weapon;
-
 
         }
 
         if (input.shoot > 0) {
             p.shoot = true;
         }
+
     });
 
     ws.on("close", () => {
