@@ -15,6 +15,12 @@ const {
 
 const WebSocket = require("ws");
 
+const { updateBots } = require("./ai");
+
+const { isWall, bulletHitWall } = require("./collision");
+
+const GAME_MODE = "singleplayer";
+
 const players = {};
 const bullets = [];
 const soundEvents = [];
@@ -24,7 +30,6 @@ const healthPacks = [];
 const healEvents = [];
 const impactEvents = [];
 const deathEvents = [];
-
 
 const wss = new WebSocket.Server({
     port: 8080
@@ -52,6 +57,62 @@ spawnHealthPack(200, 200);
 spawnHealthPack(700, 250);
 spawnHealthPack(400, 600);
 spawnHealthPack(900, 500);
+
+function spawnBot(id, x, y) {
+
+    players[id] = {
+
+        name: "Bot",
+
+        weapon: "pistol",
+
+        ammo: {
+            pistol: 12,
+            rifle: 30
+        },
+
+        reloading: false,
+
+        lastShot: 0,
+
+        kills: 0,
+        deaths: 0,
+
+        respawnTimer: 0,
+
+        flash: 0,
+
+        hitMarker: 0,
+
+        hp: 100,
+        alive: true,
+
+        x: x,
+        y: y,
+
+        angle: 0,
+
+        mouseX: x,
+        mouseY: y,
+
+        shoot: false,
+
+        up: false,
+        down: false,
+        left: false,
+        right: false,
+
+        bot: true,
+
+        avoidTimer: 0,
+
+        avoidDirection: 0
+
+    };
+
+    console.log("🤖 BOT SPAWNED:", id);
+
+}
 
 wss.on("connection", (ws) => {
 
@@ -122,6 +183,68 @@ wss.on("connection", (ws) => {
             message.toString()
         );
 
+        if (input.type === "leaveGame") {
+            console.log("🏠 PLAYER RETURNED TO MENU:", id);
+
+            // Remove bots
+            for (const playerId in players) {
+                if (players[playerId].bot) {
+                    delete players[playerId];
+                }
+            }
+
+            // Reset player's game state
+            const p = players[id];
+
+            if (p) {
+                p.hp = 100;
+                p.alive = true;
+                p.kills = 0;
+                p.deaths = 0;
+                p.x = 100;
+                p.y = 100;
+                p.shoot = false;
+                p.reload = false;
+                p.grenade = false;
+            }
+
+            return;
+        }
+
+
+        // GAME MODE
+        if (input.type === "gameMode") {
+
+            console.log(
+                "🎮 GAME MODE SELECTED:",
+                input.mode
+            );
+
+
+            if (input.mode === "singleplayer") {
+
+                console.log(
+                    "🎮 SINGLE PLAYER MODE"
+                );
+                spawnBot("bot1", 600, 300);
+
+            }
+
+
+            if (input.mode === "multiplayer") {
+
+                console.log(
+                    "🌐 MULTIPLAYER MODE"
+                );
+
+            }
+
+
+            return;
+        }
+
+
+        // NORMAL PLAYER INPUT
         const p = players[id];
 
         if (!p) return;
@@ -135,26 +258,24 @@ wss.on("connection", (ws) => {
         p.mouseY = input.mouseY;
 
         p.reload = input.reload;
+
         if (input.grenade && !p.grenade) {
             p.grenade = true;
         }
 
         if (
-
             input.weapon &&
-
             input.weapon !== p.weapon
-
         ) {
 
             p.weapon = input.weapon;
-
 
         }
 
         if (input.shoot > 0) {
             p.shoot = true;
         }
+
     });
 
     ws.on("close", () => {
@@ -168,30 +289,9 @@ wss.on("connection", (ws) => {
     });
 });
 
-function isWall(x, y) {
-
-    const col = Math.floor(x / TILE_SIZE);
-    const row = Math.floor(y / TILE_SIZE);
-
-    if (
-        row < 0 ||
-        row >= MAP.length ||
-        col < 0 ||
-        col >= MAP[0].length
-    ) {
-        return true;
-    }
-
-    return MAP[row][col] === "#";
-}
-
-function bulletHitWall(x, y) {
-
-    return isWall(x, y);
-
-}
-
 setInterval(() => {        //main game loop
+
+    updateBots(players);
 
     // PLAYER UPDATE
     for (const id in players) {
@@ -368,6 +468,10 @@ setInterval(() => {        //main game loop
             Date.now() - p.lastShot >= weapon.fireRate
 
         ) {
+
+            console.log(
+                p.bot ? "🤖 BOT FIRED!" : "👤 PLAYER FIRED!"
+            );
 
             fireWeapon(
 

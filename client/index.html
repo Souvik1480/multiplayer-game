@@ -1,14 +1,39 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Multiplayer Game</title>
+    <title>Top-Down Shooter</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<canvas id="gameCanvas"></canvas>
+    <!-- MAIN MENU -->
+    <div id="mainMenu">
 
-<script type="module" src="./game.js"></script>
+        <h1>TOP-DOWN SHOOTER</h1>
+
+        <button id="singlePlayerBtn">
+            SINGLE PLAYER
+        </button>
+
+        <button id="multiplayerBtn">
+            MULTIPLAYER
+        </button>
+
+    </div>
+
+
+    <!-- GAME -->
+    <canvas id="gameCanvas"></canvas>
+
+    <button id="backToMenuBtn">
+        BACK TO MAIN MENU
+    </button>
+
+
+    <script type="module" src="./game.js"></script>
 
 </body>
+
 </html>

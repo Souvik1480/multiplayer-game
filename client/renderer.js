@@ -31,6 +31,223 @@ function drawMap(ctx) {                              //MAP
 
 }
 
+function drawHuman(ctx, p, id) {                    //HUMAN PLAYER
+
+    ctx.save();
+
+    ctx.translate(
+
+        p.x + 25,
+        p.y + 25
+
+    );
+
+    ctx.rotate(p.angle);
+
+    if (!p.alive) {
+
+        ctx.fillStyle = "gray";
+
+    }
+    else if (id === myId) {
+
+        ctx.fillStyle = "dodgerblue";
+
+    }
+    else if (p.bot) {
+
+        ctx.fillStyle = "#d32f2f";   // Red bot
+
+    }
+    else {
+
+        ctx.fillStyle = "gold";
+
+    }
+
+    ctx.fillRect(
+
+        -25,
+        -25,
+
+        50,
+        50
+
+    );
+
+    // Gun
+    ctx.fillStyle = "black";
+
+    ctx.fillRect(
+
+        0,
+        -3,
+
+        30,
+        6
+
+    );
+
+    // --------------------
+    // MUZZLE FLASH
+    // --------------------
+
+    if (p.flash > 0) {
+
+        ctx.fillStyle = "#FFD54F";
+
+        ctx.beginPath();
+
+        ctx.moveTo(42, 0);
+
+        ctx.lineTo(52, -4);
+
+        ctx.lineTo(60, 0);
+
+        ctx.lineTo(52, 4);
+
+        ctx.closePath();
+
+        ctx.fill();
+
+    }
+
+    ctx.restore();
+
+}
+
+function drawBot(ctx, p) {                          //BOT PLAYER
+
+    ctx.save();
+
+    ctx.translate(
+        p.x + 25,
+        p.y + 25
+    );
+
+    ctx.rotate(p.angle);
+
+    // ===== BODY =====
+    ctx.fillStyle = "#C62828";
+
+    ctx.beginPath();
+
+    ctx.roundRect(
+        -25,
+        -25,
+        50,
+        50,
+        8
+    );
+
+    ctx.fill();
+
+    ctx.shadowBlur = 0;
+
+    // ===== BODY BORDER =====
+
+    ctx.strokeStyle = "#5A0000";
+
+    ctx.lineWidth = 2;
+
+    ctx.stroke();
+
+    // ===== ANTENNA =====
+
+    ctx.strokeStyle = "#444444";
+    ctx.lineWidth = 2;
+
+    // Left antenna
+    ctx.beginPath();
+
+    ctx.moveTo(-10, -25);
+
+    ctx.lineTo(-15, -40);
+
+    ctx.stroke();
+
+    // Right antenna
+    ctx.beginPath();
+
+    ctx.moveTo(10, -25);
+
+    ctx.lineTo(15, -40);
+
+    ctx.stroke();
+
+    // ===== LEFT ANTENNA TIP =====
+    
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = "#FFFF66";
+
+    ctx.fillStyle = "#FFFF66";
+
+    ctx.beginPath();
+    ctx.arc(-15, -40, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // ===== RIGHT ANTENNA TIP =====
+   
+    ctx.beginPath();
+    ctx.arc(15, -40, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = "transparent";
+
+    // ===== GLOWING EYES =====
+
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = "#FFFF66";
+
+    ctx.fillStyle = "#FFFF66";
+
+    // Left eye
+    ctx.beginPath();
+    ctx.arc(-10, -8, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Right eye
+    ctx.beginPath();
+    ctx.arc(10, -8, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Reset glow
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = "transparent";
+
+    // ===== MOUTH =====
+    ctx.strokeStyle = "#222";
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+    ctx.moveTo(-8, 10);
+    ctx.lineTo(8, 10);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(-4, 8);
+    ctx.lineTo(-4, 12);
+    ctx.moveTo(0, 8);
+    ctx.lineTo(0, 12);
+    ctx.moveTo(4, 8);
+    ctx.lineTo(4, 12);
+    ctx.stroke();
+
+    // ===== GUN =====
+    ctx.fillStyle = "black";
+
+    ctx.fillRect(
+        0,
+        -3,
+        30,
+        6
+    );
+
+    ctx.restore();
+
+}
+
 function drawPlayers(ctx) {                          //PLAYERS
 
     for (const id in players) {
@@ -63,81 +280,6 @@ function drawPlayers(ctx) {                          //PLAYERS
 
         );
 
-        ctx.save();
-
-        ctx.translate(
-
-            p.x + 25,
-            p.y + 25
-
-        );
-
-        ctx.rotate(p.angle);
-
-        if (!p.alive) {
-
-            ctx.fillStyle = "gray";
-
-        }
-        else if (id === myId) {
-
-            ctx.fillStyle = "dodgerblue";
-
-        }
-        else {
-
-            ctx.fillStyle = "gold";
-
-        }
-        ctx.fillRect(
-
-            -25,
-            -25,
-
-            50,
-            50
-
-        );
-
-        // Gun
-        ctx.fillStyle = "black";
-
-        ctx.fillRect(
-
-            0,
-            -3,
-
-            30,
-            6
-
-        );
-
-        // --------------------
-        // MUZZLE FLASH
-        // --------------------
-
-        if (p.flash > 0) {
-
-            ctx.fillStyle = "#FFD54F";
-
-            ctx.beginPath();
-
-            ctx.moveTo(42, 0);
-
-            ctx.lineTo(52, -4);
-
-            ctx.lineTo(60, 0);
-
-            ctx.lineTo(52, 4);
-
-            ctx.closePath();
-
-            ctx.fill();
-
-        }
-
-        ctx.restore();
-
         ctx.fillStyle = "white";
         ctx.font = "16px Arial";
 
@@ -160,6 +302,16 @@ function drawPlayers(ctx) {                          //PLAYERS
             p.y + 70
 
         );
+
+        if (p.bot) {
+
+            drawBot(ctx, p);
+
+        } else {
+
+            drawHuman(ctx, p, id);
+
+        }
 
         ctx.fillText(
 
@@ -705,7 +857,7 @@ export function render(                                  //RENDER
     drawFloatingTexts(ctx);
 
     drawExplosions(ctx);
-    
+
     drawParticles(ctx);
 
     ctx.restore();
