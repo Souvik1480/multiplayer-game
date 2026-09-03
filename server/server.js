@@ -58,6 +58,62 @@ spawnHealthPack(700, 250);
 spawnHealthPack(400, 600);
 spawnHealthPack(900, 500);
 
+function spawnBot(id, x, y) {
+
+    players[id] = {
+
+        name: "Bot",
+
+        weapon: "pistol",
+
+        ammo: {
+            pistol: 12,
+            rifle: 30
+        },
+
+        reloading: false,
+
+        lastShot: 0,
+
+        kills: 0,
+        deaths: 0,
+
+        respawnTimer: 0,
+
+        flash: 0,
+
+        hitMarker: 0,
+
+        hp: 100,
+        alive: true,
+
+        x: x,
+        y: y,
+
+        angle: 0,
+
+        mouseX: x,
+        mouseY: y,
+
+        shoot: false,
+
+        up: false,
+        down: false,
+        left: false,
+        right: false,
+
+        bot: true,
+
+        avoidTimer: 0,
+
+        avoidDirection: 0
+
+    };
+
+    console.log("🤖 BOT SPAWNED:", id);
+
+}
+
 wss.on("connection", (ws) => {
 
     const id = Date.now().toString();
@@ -142,57 +198,7 @@ wss.on("connection", (ws) => {
                 console.log(
                     "🎮 SINGLE PLAYER MODE"
                 );
-
-
-                players["bot1"] = {
-
-                    name: "Bot",
-
-                    weapon: "pistol",
-
-                    ammo: {
-                        pistol: 12,
-                        rifle: 30
-                    },
-
-                    reloading: false,
-
-                    lastShot: 0,
-
-                    kills: 0,
-                    deaths: 0,
-
-                    respawnTimer: 0,
-
-                    flash: 0,
-
-                    hitMarker: 0,
-
-                    hp: 100,
-                    alive: true,
-
-                    x: 600,
-                    y: 300,
-
-                    angle: 0,
-
-                    mouseX: 600,
-                    mouseY: 300,
-
-                    shoot: false,
-
-                    up: false,
-                    down: false,
-                    left: false,
-                    right: false,
-
-                    bot: true,
-
-                    avoidTimer: 0,
-
-                    avoidDirection: 0
-
-                };
+                spawnBot("bot1", 600, 300);
 
             }
 
