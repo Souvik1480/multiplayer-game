@@ -183,6 +183,34 @@ wss.on("connection", (ws) => {
             message.toString()
         );
 
+        if (input.type === "leaveGame") {
+            console.log("🏠 PLAYER RETURNED TO MENU:", id);
+
+            // Remove bots
+            for (const playerId in players) {
+                if (players[playerId].bot) {
+                    delete players[playerId];
+                }
+            }
+
+            // Reset player's game state
+            const p = players[id];
+
+            if (p) {
+                p.hp = 100;
+                p.alive = true;
+                p.kills = 0;
+                p.deaths = 0;
+                p.x = 100;
+                p.y = 100;
+                p.shoot = false;
+                p.reload = false;
+                p.grenade = false;
+            }
+
+            return;
+        }
+
 
         // GAME MODE
         if (input.type === "gameMode") {

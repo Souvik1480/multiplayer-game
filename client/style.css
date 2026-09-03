@@ -1,13 +1,13 @@
-body{
-    margin:0;
-    overflow:hidden;
-    background:#222;
+body {
+    margin: 0;
+    overflow: hidden;
+    background: #222;
 }
 
-canvas{
-    display:block;
+canvas {
+    display: block;
 
-    cursor:none;
+    cursor: none;
 }
 
 #mainMenu {
@@ -39,4 +39,31 @@ canvas{
     font-weight: bold;
 
     cursor: pointer;
+}
+
+#backToMenuBtn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+
+    display: none;
+
+    z-index: 1000;
+
+    padding: 12px 20px;
+
+    background: #222;
+    color: white;
+
+    border: 2px solid white;
+    border-radius: 8px;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+#backToMenuBtn:hover {
+    background: #444;
 }

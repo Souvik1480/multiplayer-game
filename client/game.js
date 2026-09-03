@@ -270,3 +270,37 @@ multiplayerBtn.addEventListener("click", () => {
     console.log("🌐 MULTIPLAYER STARTED");
 
 });
+
+backToMenuBtn.addEventListener("click", () => {
+    gameStarted = false;
+    shooting = false;
+
+    socket.send(JSON.stringify({
+        type: "leaveGame"
+    }));
+
+    mainMenu.style.display = "flex";
+    backToMenuBtn.style.display = "none";
+
+    console.log("🏠 BACK TO MAIN MENU");
+});
+
+singlePlayerBtn.addEventListener("click", () => {
+    selectGameMode("singleplayer");
+
+    gameStarted = true;
+    mainMenu.style.display = "none";
+    backToMenuBtn.style.display = "block";
+
+    console.log("🎮 SINGLE PLAYER STARTED");
+});
+
+multiplayerBtn.addEventListener("click", () => {
+    selectGameMode("multiplayer");
+
+    gameStarted = true;
+    mainMenu.style.display = "none";
+    backToMenuBtn.style.display = "block";
+
+    console.log("🌐 MULTIPLAYER STARTED");
+});
