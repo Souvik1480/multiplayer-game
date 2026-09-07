@@ -175,7 +175,26 @@ function updateBots(players) {
 
                 } else {
 
+                    // Can't see player
                     bot.shoot = false;
+
+                    // Try moving around the obstacle
+                    if (bot.avoidTimer <= 0) {
+
+                        bot.avoidTimer = 30;
+
+                        // Choose a direction perpendicular to the player
+                        const directionToPlayer = Math.atan2(dy, dx);
+
+                        if (Math.random() < 0.5) {
+                            bot.avoidDirection =
+                                directionToPlayer + Math.PI / 2;
+                        } else {
+                            bot.avoidDirection =
+                                directionToPlayer - Math.PI / 2;
+                        }
+
+                    }
 
                 }
 
