@@ -45,6 +45,36 @@ function moveBot(bot, moveX, moveY) {
 
 }
 
+function hasLineOfSight(bot, target) {
+
+    const startX = bot.x + 25;
+    const startY = bot.y + 25;
+
+    const endX = target.x + 25;
+    const endY = target.y + 25;
+
+    const dx = endX - startX;
+    const dy = endY - startY;
+
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    const steps = Math.ceil(distance / 10);
+
+    for (let i = 1; i <= steps; i++) {
+
+        const t = i / steps;
+
+        const x = startX + dx * t;
+        const y = startY + dy * t;
+
+        if (isWall(x, y)) {
+            return false;
+        }
+
+    }
+
+    return true;
+}
 
 function updateBots(players) {
 
@@ -129,13 +159,23 @@ function updateBots(players) {
 
             } else {
 
-                if (bot.ammo[bot.weapon] > 0) {
+                const canSeeTarget = hasLineOfSight(bot, nearest);
 
-                    bot.shoot = true;
+                if (canSeeTarget) {
+
+                    if (bot.ammo[bot.weapon] > 0) {
+
+                        bot.shoot = true;
+
+                    } else {
+
+                        bot.reload = true;
+
+                    }
 
                 } else {
 
-                    bot.reload = true;
+                    bot.shoot = false;
 
                 }
 
