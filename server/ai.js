@@ -118,7 +118,9 @@ function updateBots(players) {
             const dx = nearest.x - bot.x;
             const dy = nearest.y - bot.y;
 
-            bot.angle = Math.atan2(dy, dx);
+            const targetAngle = Math.atan2(dy, dx);
+
+            bot.angle = targetAngle;
 
             const distance = Math.sqrt(dx * dx + dy * dy);
 
