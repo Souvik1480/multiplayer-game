@@ -1,5 +1,7 @@
 const { isWall } = require("./collision");
 
+const CURRENT_DIFFICULTY = "normal";
+
 function moveBot(bot, moveX, moveY) {
 
     const newX = bot.x + moveX;
@@ -84,6 +86,24 @@ function updateBots(players) {
 
         if (!bot.bot) continue;
 
+        const difficulty = bot.difficulty || "normal";
+
+        const difficultySettings = {
+
+            easy: {
+                speed: 1.5
+            },
+
+            normal: {
+                speed: 2
+            },
+
+            hard: {
+                speed: 2.5
+            }
+
+        };
+
         let nearest = null;
         let nearestDistance = Infinity;
 
@@ -126,8 +146,24 @@ function updateBots(players) {
 
             const ATTACK_RANGE = 250;
 
-            const BOT_SPEED = 2;
+            const difficulty = bot.difficulty || "normal";
 
+            const difficultySettings = {
+                easy: {
+                    speed: 1.5
+                },
+
+                normal: {
+                    speed: 2
+                },
+
+                hard: {
+                    speed: 2.5
+                }
+            };
+
+            const BOT_SPEED =
+                difficultySettings[difficulty].speed;
             // --------------------
             // OBSTACLE AVOIDANCE
             // --------------------

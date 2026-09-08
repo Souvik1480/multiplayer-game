@@ -58,7 +58,7 @@ spawnHealthPack(700, 250);
 spawnHealthPack(400, 600);
 spawnHealthPack(900, 500);
 
-function spawnBot(id, x, y) {
+function spawnBot(id, x, y, difficulty) {
 
     players[id] = {
 
@@ -104,6 +104,8 @@ function spawnBot(id, x, y) {
 
         bot: true,
 
+        difficulty: difficulty || "normal",
+
         avoidTimer: 0,
 
         avoidDirection: 0
@@ -139,6 +141,8 @@ wss.on("connection", (ws) => {
 
         kills: 0,
         deaths: 0,
+
+        difficulty: "normal",
 
         respawnTimer: 0,
 
@@ -183,6 +187,28 @@ wss.on("connection", (ws) => {
             message.toString()
         );
 
+        if (input.type === "difficulty") {
+
+            const p = players[id];
+
+            if (!p) return;
+
+            if (
+                input.difficulty === "easy" ||
+                input.difficulty === "normal" ||
+                input.difficulty === "hard"
+            ) {
+                p.difficulty = input.difficulty;
+
+                console.log(
+                    "🤖 BOT DIFFICULTY:",
+                    input.difficulty
+                );
+            }
+
+            return;
+        }
+
         if (input.type === "leaveGame") {
             console.log("🏠 PLAYER RETURNED TO MENU:", id);
 
@@ -222,12 +248,17 @@ wss.on("connection", (ws) => {
 
 
             if (input.mode === "singleplayer") {
+                console.log("🎮 SINGLE PLAYER MODE");
 
-                console.log(
-                    "🎮 SINGLE PLAYER MODE"
-                );
-                spawnBot("bot1", 600, 300);
-
+                if (!players["bot1"]) {
+                    
+                    spawnBot(
+                        "bot1",
+                        600,
+                        300,
+                        players[id]?.difficulty || "normal"
+                    );
+                }
             }
 
 

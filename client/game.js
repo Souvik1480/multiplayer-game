@@ -113,11 +113,14 @@ function canPlayLocalGunSound() {
 
 }
 
+
+
 function sendInput() {
 
     if (socket.readyState !== WebSocket.OPEN)
         return;
 
+    // ...
     // --------------------
     // WEAPON SWITCH
     // --------------------
@@ -244,20 +247,47 @@ function gameLoop() {
 gameLoop();
 
 const mainMenu = document.getElementById("mainMenu");
-const singlePlayerBtn = document.getElementById("singlePlayerBtn");
-const multiplayerBtn = document.getElementById("multiplayerBtn");
+
+const singlePlayerBtn =
+    document.getElementById("singlePlayerBtn");
+
+const multiplayerBtn =
+    document.getElementById("multiplayerBtn");
+
+const difficultyMenu =
+    document.getElementById("difficultyMenu");
+
+const easyBtn =
+    document.getElementById("easyBtn");
+
+const normalBtn =
+    document.getElementById("normalBtn");
+
+const hardBtn =
+    document.getElementById("hardBtn");
+
+const backToMenuBtn =
+    document.getElementById("backToMenuBtn");
+
+
+// ============================
+// SINGLE PLAYER
+// ============================
 
 singlePlayerBtn.addEventListener("click", () => {
 
-    selectGameMode("singleplayer");
-
-    gameStarted = true;
-
     mainMenu.style.display = "none";
 
-    console.log("🎮 SINGLE PLAYER STARTED");
+    difficultyMenu.style.display = "flex";
+
+    console.log("🎮 SINGLE PLAYER");
 
 });
+
+
+// ============================
+// MULTIPLAYER
+// ============================
 
 multiplayerBtn.addEventListener("click", () => {
 
@@ -267,11 +297,19 @@ multiplayerBtn.addEventListener("click", () => {
 
     mainMenu.style.display = "none";
 
+    backToMenuBtn.style.display = "block";
+
     console.log("🌐 MULTIPLAYER STARTED");
 
 });
 
+
+// ============================
+// BACK TO MAIN MENU
+// ============================
+
 backToMenuBtn.addEventListener("click", () => {
+
     gameStarted = false;
     shooting = false;
 
@@ -279,28 +317,62 @@ backToMenuBtn.addEventListener("click", () => {
         type: "leaveGame"
     }));
 
-    mainMenu.style.display = "flex";
+    difficultyMenu.style.display = "none";
+
     backToMenuBtn.style.display = "none";
 
+    mainMenu.style.display = "flex";
+
     console.log("🏠 BACK TO MAIN MENU");
+
 });
 
-singlePlayerBtn.addEventListener("click", () => {
+
+// ============================
+// START SINGLE PLAYER
+// ============================
+
+function startSinglePlayer(difficulty) {
+
     selectGameMode("singleplayer");
 
+    socket.send(JSON.stringify({
+        type: "difficulty",
+        difficulty: difficulty
+    }));
+
     gameStarted = true;
-    mainMenu.style.display = "none";
+
+    difficultyMenu.style.display = "none";
+
     backToMenuBtn.style.display = "block";
 
-    console.log("🎮 SINGLE PLAYER STARTED");
+    console.log(
+        "🤖 DIFFICULTY:",
+        difficulty
+    );
+
+}
+
+
+// ============================
+// DIFFICULTY BUTTONS
+// ============================
+
+easyBtn.addEventListener("click", () => {
+
+    startSinglePlayer("easy");
+
 });
 
-multiplayerBtn.addEventListener("click", () => {
-    selectGameMode("multiplayer");
+normalBtn.addEventListener("click", () => {
 
-    gameStarted = true;
-    mainMenu.style.display = "none";
-    backToMenuBtn.style.display = "block";
+    startSinglePlayer("normal");
 
-    console.log("🌐 MULTIPLAYER STARTED");
+});
+
+hardBtn.addEventListener("click", () => {
+
+    startSinglePlayer("hard");
+
 });

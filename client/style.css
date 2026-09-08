@@ -67,3 +67,43 @@ canvas {
 #backToMenuBtn:hover {
     background: #444;
 }
+
+#mainMenu,
+#difficultyMenu {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    z-index: 1000;
+}
+
+#difficultyMenu {
+    display: none;
+}
+
+#difficultyMenu h1 {
+    margin-bottom: 30px;
+}
+
+#difficultyMenu button {
+    width: 220px;
+
+    padding: 15px;
+
+    margin: 8px;
+
+    font-size: 18px;
+
+    cursor: pointer;
+}

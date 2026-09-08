@@ -59,8 +59,18 @@ function fireWeapon(player, bullets, ownerId, soundEvents) {
     // BOT AIM
     if (player.bot) {
 
+        let accuracy;
+
+        if (player.difficulty === "easy") {
+            accuracy = 0.30;
+        } else if (player.difficulty === "hard") {
+            accuracy = 0.07;
+        } else {
+            accuracy = 0.15;
+        }
+
         const botAimError =
-            (Math.random() - 0.5) * 0.15;
+            (Math.random() - 0.5) * accuracy;
 
         angle = player.angle + spread + botAimError;
 
