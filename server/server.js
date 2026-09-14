@@ -248,17 +248,45 @@ wss.on("connection", (ws) => {
 
 
             if (input.mode === "singleplayer") {
+
                 console.log("🎮 SINGLE PLAYER MODE");
 
+                const difficulty =
+                    players[id]?.difficulty || "normal";
+
                 if (!players["bot1"]) {
-                    
+
                     spawnBot(
                         "bot1",
-                        600,
-                        300,
-                        players[id]?.difficulty || "normal"
+                        128,
+                        128,
+                        difficulty
                     );
+
                 }
+
+                if (!players["bot2"]) {
+
+                    spawnBot(
+                        "bot2",
+                        1088,
+                        128,
+                        difficulty
+                    );
+
+                }
+
+                if (!players["bot3"]) {
+
+                    spawnBot(
+                        "bot3",
+                        128,
+                        576,
+                        difficulty
+                    );
+
+                }
+
             }
 
 
