@@ -1,6 +1,29 @@
-const { isWall } = require("./collision");
+const DIFFICULTY = {
 
-const CURRENT_DIFFICULTY = "normal";
+    easy: {
+        speed: 1.2,
+        attackRange: 220,
+        accuracy: 0.18,
+        reactionTime: 30
+    },
+
+    normal: {
+        speed: 2,
+        attackRange: 250,
+        accuracy: 0.10,
+        reactionTime: 15
+    },
+
+    hard: {
+        speed: 2.5,
+        attackRange: 300,
+        accuracy: 0.04,
+        reactionTime: 5
+    }
+
+};
+
+const { isWall } = require("./collision");
 
 function moveBot(bot, moveX, moveY) {
 
@@ -85,24 +108,7 @@ function updateBots(players) {
         const bot = players[id];
 
         if (!bot.bot) continue;
-
-        const difficulty = bot.difficulty || "normal";
-
-        const difficultySettings = {
-
-            easy: {
-                speed: 1.5
-            },
-
-            normal: {
-                speed: 2
-            },
-
-            hard: {
-                speed: 2.5
-            }
-
-        };
+        if(!bot.alive) continue;
 
         let nearest = null;
         let nearestDistance = Infinity;
@@ -138,32 +144,35 @@ function updateBots(players) {
             const dx = nearest.x - bot.x;
             const dy = nearest.y - bot.y;
 
-            const targetAngle = Math.atan2(dy, dx);
-
-            bot.angle = targetAngle;
-
             const distance = Math.sqrt(dx * dx + dy * dy);
 
-            const ATTACK_RANGE = 250;
+            const difficulty =
+                DIFFICULTY[bot.difficulty] ||
+                DIFFICULTY.normal;
 
-            const difficulty = bot.difficulty || "normal";
+            const ATTACK_RANGE = difficulty.attackRange;
 
-            const difficultySettings = {
-                easy: {
-                    speed: 1.5
-                },
+            const BOT_SPEED = difficulty.speed;
 
-                normal: {
-                    speed: 2
-                },
+            const targetAngle = Math.atan2(dy, dx);
 
-                hard: {
-                    speed: 2.5
-                }
-            };
+            const aimError =
+                difficulty.accuracy;
 
-            const BOT_SPEED =
-                difficultySettings[difficulty].speed;
+            if (bot.aimAngle === undefined) {
+
+                bot.aimAngle = targetAngle;
+
+            }
+
+            bot.aimAngle +=
+                (targetAngle - bot.aimAngle) *
+                (1 / difficulty.reactionTime);
+
+            bot.angle =
+                bot.aimAngle +
+                (Math.random() - 0.5) * aimError;
+
             // --------------------
             // OBSTACLE AVOIDANCE
             // --------------------

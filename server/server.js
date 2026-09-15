@@ -30,6 +30,7 @@ const healthPacks = [];
 const healEvents = [];
 const impactEvents = [];
 const deathEvents = [];
+let roundOver = false;
 
 const wss = new WebSocket.Server({
     port: 8080
@@ -57,6 +58,83 @@ spawnHealthPack(200, 200);
 spawnHealthPack(700, 250);
 spawnHealthPack(400, 600);
 spawnHealthPack(900, 500);
+
+function findSafeSpawn(usedPositions = []) {
+
+    const safePositions = [];
+
+    const MIN_DISTANCE = 300;
+
+    for (let row = 1; row < MAP.length - 1; row++) {
+
+        for (let col = 1; col < MAP[row].length - 1; col++) {
+
+            if (MAP[row][col] !== ".")
+                continue;
+
+            const x = col * TILE_SIZE;
+            const y = row * TILE_SIZE;
+
+            // Make sure the entire bot fits inside an open area
+            if (
+                isWall(x, y) ||
+                isWall(x + 49, y) ||
+                isWall(x, y + 49) ||
+                isWall(x + 49, y + 49)
+            ) {
+
+                continue;
+
+            }
+
+            // Check distance from already selected spawn points
+            let tooClose = false;
+
+            for (const position of usedPositions) {
+
+                const dx = x - position.x;
+                const dy = y - position.y;
+
+                const distance =
+                    Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < MIN_DISTANCE) {
+
+                    tooClose = true;
+                    break;
+
+                }
+
+            }
+
+            if (tooClose)
+                continue;
+
+            safePositions.push({
+                x,
+                y
+            });
+
+        }
+
+    }
+
+    if (safePositions.length === 0) {
+
+        return {
+            x: 128,
+            y: 128
+        };
+
+    }
+
+    return safePositions[
+        Math.floor(
+            Math.random() * safePositions.length
+        )
+    ];
+
+}
 
 function spawnBot(id, x, y, difficulty) {
 
@@ -114,6 +192,34 @@ function spawnBot(id, x, y, difficulty) {
 
     console.log("🤖 BOT SPAWNED:", id);
 
+}
+
+function checkRoundWin() {
+
+    if (GAME_MODE !== "singleplayer")
+        return;
+
+    if (roundOver)
+        return;
+
+    const bots = [
+        players["bot1"],
+        players["bot2"],
+        players["bot3"]
+    ];
+
+    if (
+        bots.length === 3 &&
+        bots.every(bot => bot && !bot.alive)
+    ) {
+
+        roundOver = true;
+
+        console.log("🏆 ROUND WON!");
+
+        return true;
+    }
+    return false;
 }
 
 wss.on("connection", (ws) => {
@@ -254,12 +360,23 @@ wss.on("connection", (ws) => {
                 const difficulty =
                     players[id]?.difficulty || "normal";
 
+                const spawnPositions = [];
+
+                const spawn1 = findSafeSpawn(spawnPositions);
+                spawnPositions.push(spawn1);
+
+                const spawn2 = findSafeSpawn(spawnPositions);
+                spawnPositions.push(spawn2);
+
+                const spawn3 = findSafeSpawn(spawnPositions);
+                spawnPositions.push(spawn3);
+
                 if (!players["bot1"]) {
 
                     spawnBot(
                         "bot1",
-                        128,
-                        128,
+                        spawn1.x,
+                        spawn1.y,
                         difficulty
                     );
 
@@ -269,8 +386,8 @@ wss.on("connection", (ws) => {
 
                     spawnBot(
                         "bot2",
-                        1088,
-                        128,
+                        spawn2.x,
+                        spawn2.y,
                         difficulty
                     );
 
@@ -280,13 +397,12 @@ wss.on("connection", (ws) => {
 
                     spawnBot(
                         "bot3",
-                        128,
-                        576,
+                        spawn3.x,
+                        spawn3.y,
                         difficulty
                     );
 
                 }
-
             }
 
 
@@ -298,6 +414,28 @@ wss.on("connection", (ws) => {
 
             }
 
+
+            return;
+        }
+
+        // RASTART ROUND
+        if (input.type === "restartRound") {
+
+            console.log("🔄 RESTARTING ROUND");
+
+            roundOver = false;
+
+            // Remove old bots
+            delete players["bot1"];
+            delete players["bot2"];
+            delete players["bot3"];
+
+            // Spawn fresh bots
+            spawnBot("bot1", 600, 300, players[id]?.difficulty || "normal");
+            spawnBot("bot2", 900, 500, players[id]?.difficulty || "normal");
+            spawnBot("bot3", 1100, 250, players[id]?.difficulty || "normal");
+
+            console.log("🤖 3 BOTS RESPAWNED FOR NEW ROUND");
 
             return;
         }
@@ -369,6 +507,12 @@ setInterval(() => {        //main game loop
         }
 
         if (!p.alive) {
+
+            //bots do not respawn
+            if (p.bot && GAME_MODE === "singleplayer") {
+
+                continue;
+            }
 
             p.respawnTimer--;
 
@@ -779,6 +923,8 @@ setInterval(() => {        //main game loop
                             weapon: b.weapon,
                             timer: 300
                         });
+
+                        checkRoundWin();
                     }
                 }
 
@@ -953,6 +1099,7 @@ setInterval(() => {        //main game loop
 
                         //Award the kill
                         if (players[g.owner]) {
+
                             players[g.owner].kills++;
 
                             killFeed.unshift({
@@ -961,6 +1108,8 @@ setInterval(() => {        //main game loop
                                 weapon: "grenade",
                                 timer: 300
                             });
+
+                            checkRoundWin();
                         }
                     }
 
@@ -1036,6 +1185,8 @@ setInterval(() => {
             sounds: soundEvents,
             impactEvents,
             deathEvents,
+
+            roundOver,
 
             healEvent:
                 healEvents.find(

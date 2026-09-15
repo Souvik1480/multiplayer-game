@@ -107,3 +107,91 @@ canvas {
 
     cursor: pointer;
 }
+
+#gameHUD {
+
+    position: fixed;
+
+    top: 20px;
+    left: 20px;
+
+    z-index: 1000;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 18px;
+
+    color: white;
+
+    pointer-events: none;
+
+    gap: 12px;
+
+    align-items: center;
+
+}
+
+#healthHUD,
+#weaponHUD,
+#killsHUD {
+
+    background: rgba(0, 0, 0, 0.65);
+
+    padding: 8px 12px;
+
+    border-radius: 8px;
+
+    white-space: nowrap;
+
+}
+
+#winScreen {
+
+    display: none;
+
+    position: fixed;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    z-index: 2000;
+
+    width: 350px;
+
+    padding: 35px;
+
+    text-align: center;
+
+    background: rgba(0, 0, 0, 0.9);
+
+    border: 2px solid white;
+
+    border-radius: 15px;
+
+    color: white;
+
+    font-family: Arial, sans-serif;
+}
+
+#winScreen h1 {
+
+    margin-bottom: 10px;
+
+}
+
+#winScreen button {
+
+    display: block;
+
+    width: 100%;
+
+    margin-top: 15px;
+
+    padding: 12px;
+
+    font-size: 16px;
+
+    cursor: pointer;
+}

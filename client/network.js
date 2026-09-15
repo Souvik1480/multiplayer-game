@@ -29,6 +29,10 @@ export let grenades = [];
 export let killFeed = [];
 export let healthPacks = [];
 export let gameMode = "";
+export let roundOver = false;
+export function resetRoundState() {
+    roundOver = false;
+}
 
 socket.onopen = () => {
 
@@ -60,6 +64,8 @@ socket.onmessage = (event) => {
 
     healthPacks.length = 0;
     healthPacks.push(...(data.healthPacks || []));
+
+    roundOver = data.roundOver;
 
     if (data.sounds && data.sounds.length > 0) {
 

@@ -1,5 +1,5 @@
 import { keys } from "./input.js";
-import socket, { players, bullets, myId, selectGameMode } from "./network.js";
+import socket, { players, bullets, myId, selectGameMode, roundOver, resetRoundState } from "./network.js";
 import { map, TILE_SIZE } from "./map.js";
 import { render } from "./renderer.js";
 import { updateCamera, cameraX, cameraY, addCameraShake } from "./camera.js";
@@ -14,6 +14,7 @@ let shooting = false;
 let lastRifleSound = 0;
 let grenadeRequest = false;
 let gameStarted = false;
+
 
 window.addEventListener(
     "mouseup",
@@ -227,6 +228,16 @@ function gameLoop() {
 
     updateCamera(players);
 
+    if (roundOver && gameStarted) {
+
+        gameStarted = false;
+
+        shooting = false;
+
+        winScreen.style.display = "block";
+
+    }
+
     sendInput();
 
     render(
@@ -268,6 +279,15 @@ const hardBtn =
 
 const backToMenuBtn =
     document.getElementById("backToMenuBtn");
+
+const winScreen =
+    document.getElementById("winScreen");
+
+const playAgainBtn =
+    document.getElementById("playAgainBtn");
+
+const winMenuBtn =
+    document.getElementById("winMenuBtn");
 
 
 // ============================
@@ -347,6 +367,7 @@ function startSinglePlayer(difficulty) {
 
     backToMenuBtn.style.display = "block";
 
+
     console.log(
         "🤖 DIFFICULTY:",
         difficulty
@@ -374,5 +395,25 @@ normalBtn.addEventListener("click", () => {
 hardBtn.addEventListener("click", () => {
 
     startSinglePlayer("hard");
+
+});
+
+// ============================
+// WIN SCREEN BUTTONS
+// ============================
+
+playAgainBtn.addEventListener("click", () => {
+
+    resetRoundState();
+
+    winScreen.style.display = "none";
+
+    gameStarted = true;
+
+    socket.send(JSON.stringify({
+        type: "restartRound"
+    }));
+
+    console.log("🔄 ROUND RESTARTED");
 
 });
